@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "goygovrustam_Coinbase_logo_combined_with_text_Onramp._C_from__f4d15350-dd45-4a69-8f29-9e32311f4051_2.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "goygovrustam_Coinbase_logo_combined_with_text_Onramp._C_from__f4d15350-dd45-4a69-8f29-9e32311f4051_2 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "goygovrustam_Coinbase_logo_combined_with_text_Onramp._C_from__f4d15350-dd45-4a69-8f29-9e32311f4051_2 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
