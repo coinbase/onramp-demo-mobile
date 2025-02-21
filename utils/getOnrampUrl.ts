@@ -1,38 +1,6 @@
 import { ONRAMP_BUY_URL } from "@/constants/constants";
 
 /**
- * Builds a Coinbase Onramp buy URL using the provided parameters.
- * @param projectId a projectId generated in the Coinbase Developer Portal
- * @returns the URL
- */
-export function getOnrampBuyUrl({
-  projectId,
-  ...props
-}: GetOnrampUrlWithProjectIdParams | GetOnrampUrlWithSessionTokenParams) {
-  const url = new URL(ONRAMP_BUY_URL);
-
-  if (projectId !== undefined) {
-    // Coinbase Onramp requires projectId to be passed as appId
-    url.searchParams.append("appId", projectId);
-  }
-
-  for (const key of Object.keys(props) as (keyof typeof props)[]) {
-    const value = props[key];
-    if (value !== undefined) {
-      if (["string", "number", "boolean"].includes(typeof value)) {
-        url.searchParams.append(key as string, value.toString());
-      } else {
-        url.searchParams.append(key as string, JSON.stringify(value));
-      }
-    }
-  }
-
-  url.searchParams.sort();
-
-  return url.toString();
-}
-
-/**
  * Props used to get an Onramp buy URL by directly providing a CDP project ID.
  * See https://docs.cdp.coinbase.com/onramp/docs/api-initializing#generating-the-coinbase-onramp-buysell-url
  *
@@ -142,3 +110,35 @@ type GetOnrampBuyUrlOptionalProps = {
    */
   originComponentName?: string;
 };
+
+/**
+ * Builds a Coinbase Onramp buy URL using the provided parameters.
+ * @param projectId a projectId generated in the Coinbase Developer Portal
+ * @returns the URL
+ */
+export function getOnrampBuyUrl({
+  projectId,
+  ...props
+}: GetOnrampUrlWithProjectIdParams | GetOnrampUrlWithSessionTokenParams) {
+  const url = new URL(ONRAMP_BUY_URL);
+
+  if (projectId !== undefined) {
+    // Coinbase Onramp requires projectId to be passed as appId
+    url.searchParams.append("appId", projectId);
+  }
+
+  for (const key of Object.keys(props) as (keyof typeof props)[]) {
+    const value = props[key];
+    if (value !== undefined) {
+      if (["string", "number", "boolean"].includes(typeof value)) {
+        url.searchParams.append(key as string, value.toString());
+      } else {
+        url.searchParams.append(key as string, JSON.stringify(value));
+      }
+    }
+  }
+
+  url.searchParams.sort();
+
+  return url.toString();
+}

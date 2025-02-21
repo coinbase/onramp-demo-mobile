@@ -1,40 +1,47 @@
+import { CDP_PROJECT_ID } from "@/constants/constants";
 import { getOnrampBuyUrl } from "@/utils/getOnrampUrl";
+import { MaterialIcons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
-import React, { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { Input } from "../Input/Input";
-import { ThemedText } from "../ThemedText";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import Button from "../Button/Button";
 
 type FundProps = {
-  title?: string;
+  currency?: string;
+  amount?: string;
+  asset?: string;
+  walletAddress: string;
+  walletChain: string;
 };
 
-export const Fund = ({ title = "Fund" }: FundProps) => {
-  const [currency, setCurrency] = useState("USD");
-  const [amount, setAmount] = useState("20");
-  const [asset, setAsset] = useState("ETH");
-
-  const handlePress = async () => {
+export const Fund = ({
+  currency = "USD",
+  amount = "0",
+  asset = "ETH",
+  walletAddress,
+  walletChain = "base",
+}: FundProps) => {
+  const handlePressFund = async () => {
     try {
+      /**
+       * This is the main integration point for the Coinbase Onramp
+       *
+       * 1. Get the Onramp URL
+       * 2. Open the browser with the Onramp URL
+       */
       const onrampBuyUrl = getOnrampBuyUrl({
-        // projectId from the CDP portal Dashboard
-        projectId: "6eceb045-266a-4940-9d22-35952496ff00",
-        // addresses to fund
+        projectId: CDP_PROJECT_ID,
         addresses: {
-          "0x438BbEF3525eF1b0359160FD78AF9c1158485d87": ["base"],
+          [walletAddress]: [walletChain],
         },
-        // assets to fund
         assets: [asset],
-        // preset fiat amount to fund
         presetFiatAmount: Number(amount),
-        // fiat currency
         fiatCurrency: currency,
-        // redirect url after the payment is complete
-        redirectUrl: "https://yourapp.com/onramp-return?param=foo",
+        redirectUrl: "onrampdemo://",
       });
 
       await WebBrowser.openBrowserAsync(onrampBuyUrl, {
-        dismissButtonStyle: "cancel",
+        dismissButtonStyle: "done",
         readerMode: false,
       });
     } catch (error) {
@@ -44,44 +51,19 @@ export const Fund = ({ title = "Fund" }: FundProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <View style={styles.inputWrapper}>
-          <Input
-            label="Currency"
-            placeholder="Enter currency"
-            keyboardType="default"
-            value={currency}
-            onChangeText={setCurrency}
+      <Button
+        title="Fund with Coinbase"
+        onPress={handlePressFund}
+        variant="primary"
+        icon={
+          <MaterialIcons
+            name="currency-exchange"
+            size={24}
+            color="white"
+            style={styles.icon}
           />
-        </View>
-
-        <View style={styles.inputWrapper}>
-          <Input
-            label="Amount"
-            placeholder="Enter amount"
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-          />
-        </View>
-        <View style={styles.inputWrapper}>
-          <Input
-            label="Asset"
-            placeholder="Enter asset"
-            keyboardType="default"
-            value={asset}
-            onChangeText={setAsset}
-          />
-        </View>
-      </View>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handlePress}
-        activeOpacity={0.7}
-      >
-        <ThemedText style={styles.buttonText}>{title}</ThemedText>
-      </TouchableOpacity>
+        }
+      />
     </View>
   );
 };
@@ -90,27 +72,12 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     gap: 16,
+    marginTop: 20,
   },
-  inputContainer: {
-    flexDirection: "row",
-    gap: 16,
-    width: "100%",
-  },
-  inputWrapper: {
-    flex: 1, // This makes each input take exactly half the space
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
+  icon: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
   },
 });
 

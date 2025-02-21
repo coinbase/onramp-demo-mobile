@@ -1,4 +1,4 @@
-package com.anonymous.onrampdemomobile
+package com.coinbase.onramp.demo
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

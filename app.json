@@ -2,6 +2,7 @@
   "expo": {
     "name": "Onramp Demo Mobile",
     "slug": "onramp-demo-mobile",
+    "scheme": "onrampdemo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,14 +18,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.your.bundleid"
+      "bundleIdentifier": "com.coinbase.onramp.demo"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.your.packagename"
+      "package": "com.coinbase.onramp.demo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,6 +35,10 @@
         "projectId": "110693b4-babe-436f-9496-b38287772849"
       }
     },
-    "owner": "rustam.goygov"
+    "owner": "coinbase",
+    "plugins": [
+      "expo-secure-store",
+      "expo-font"
+    ]
   }
 }

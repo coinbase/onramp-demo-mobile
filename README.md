@@ -1,8 +1,6 @@
-# Welcome to your Expo app 👋
+# Welcome to Coinbase Onramp Demo App 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
+## Running the app
 
 1. Install dependencies
 
@@ -10,41 +8,42 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. For `Android`, you need a debug keystore (required for app signing):
+   
+   If debug.keystore doesn't exist in android/app, create it:
+   ```bash
+   cd android/app
+   keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000
+   ```
+   
+   Default debug keystore credentials (for development only):
+   - Keystore password: `android`
+   - Key alias: `androiddebugkey`
+   - Key password: `android`
+
+   > Note: This keystore is for development only. For production, you'll need to create a separate release keystore.
+
+3. Start the app
 
    ```bash
     npx expo start
    ```
+4. Follow the output instructions to run the app on your device or simulator.
 
-In the output, you'll find options to open the app in a
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Onramp integration demo
+Main integration point is in the [Fund](./components/Fund/Fund.tsx) component.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+### Steps to integrate:
 
-When you're ready, run:
+1. Register and get the projectId from the [CDP portal](https://cdp.coinbase.com/projects)
 
-```bash
-npm run reset-project
-```
+2. Assemble the Onramp URL with the [getOnrampBuyUrl](./utils/getOnrampUrl.ts) function
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+3. Open the browser with the Onramp URL
 
-## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-## Join the community
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

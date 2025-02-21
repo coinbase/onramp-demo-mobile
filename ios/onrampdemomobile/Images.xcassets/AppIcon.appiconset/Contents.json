@@ -1,14 +1,14 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "goygovrustam_Coinbase_logo_combined_with_text_Onramp._C_from__f4d15350-dd45-4a69-8f29-9e32311f4051_2.png",
-      "idiom" : "universal",
-      "platform" : "ios",
-      "size" : "1024x1024"
+      "filename": "App-Icon-1024x1024@1x.png",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "version": 1,
+    "author": "expo"
   }
 }
