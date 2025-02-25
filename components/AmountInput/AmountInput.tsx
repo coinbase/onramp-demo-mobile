@@ -20,18 +20,34 @@ export const AmountInput = ({
 }: AmountInputProps) => {
   const textColor = COINBASE_BLUE;
 
-  const formatAmount = useCallback(
-    (amount: string) => {
-      const cleanAmount = amount.replace(/[^0-9.]/g, "");
-      const parts = cleanAmount.split(".");
-      if (parts.length > 2) return value;
-      if (parts[1]?.length > 2) {
-        return `${parts[0]}.${parts[1].slice(0, 2)}`;
-      }
-      return cleanAmount;
-    },
-    [value]
-  );
+  const formatAmount = useCallback((amount: string) => {
+    // Remove any non-digit and non-decimal characters
+    const cleanAmount = amount.replace(/[^0-9.]/g, "");
+
+    // Handle special cases
+    if (cleanAmount === "") return "";
+    if (cleanAmount === ".") return "0.";
+
+    // If input starts with "0" followed by a number, insert decimal point
+    if (cleanAmount.match(/^0[0-9]/)) {
+      return cleanAmount.replace(/^0([0-9])/, "0.$1");
+    }
+
+    // Split into integer and decimal parts
+    const parts = cleanAmount.split(".");
+
+    // Handle integer part - remove leading zeros unless it's just "0"
+    let integerPart = parts[0].replace(/^0+/, "") || "0";
+
+    // If there's a decimal part
+    if (parts.length > 1) {
+      // Take only first 2 decimal places
+      const decimalPart = parts[1].slice(0, 2);
+      return `${integerPart}.${decimalPart}`;
+    }
+
+    return integerPart;
+  }, []);
 
   const handleChangeText = (text: string) => {
     const formattedAmount = formatAmount(text);
@@ -46,12 +62,12 @@ export const AmountInput = ({
             {prefix}
           </ThemedText>
           <TextInput
+            inputMode="decimal"
             style={[styles.input, { color: textColor }]}
             value={value}
             onChangeText={handleChangeText}
             keyboardType="decimal-pad"
             maxLength={8}
-            selectTextOnFocus
             placeholder="0"
             placeholderTextColor={`${textColor}4D`}
           />

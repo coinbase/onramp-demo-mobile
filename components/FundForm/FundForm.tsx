@@ -21,22 +21,22 @@ type FundFormProps = {
   currency: string;
   amount: string;
   asset: string;
+  walletAddress: string;
+  walletChain: string;
   onChangeCurrency: (value: string) => void;
   onChangeAmount: (value: string) => void;
   onChangeAsset: (value: string) => void;
-  walletAddress: string;
-  walletChain: string;
 };
 
 export const FundForm = ({
   currency,
   amount,
   asset,
+  walletAddress,
+  walletChain,
   onChangeCurrency,
   onChangeAmount,
   onChangeAsset,
-  walletAddress,
-  walletChain,
 }: FundFormProps) => {
   return (
     <View style={styles.container}>

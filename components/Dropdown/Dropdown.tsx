@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   FlatList,
   Image,
+  ImageSourcePropType,
   Modal,
   Pressable,
   StyleSheet,
@@ -16,6 +17,7 @@ type DropdownOption = {
   label: string;
   value: string;
   iconUrl?: string;
+  icon?: ImageSourcePropType;
 };
 
 type DropdownProps = {
@@ -48,9 +50,9 @@ export const Dropdown = ({
       }}
     >
       <View style={styles.optionContent}>
-        {option.iconUrl && (
+        {(option.iconUrl || option.icon) && (
           <Image
-            source={{ uri: option.iconUrl }}
+            source={option.icon || { uri: option.iconUrl }}
             style={styles.icon}
             resizeMode="contain"
           />
@@ -77,9 +79,9 @@ export const Dropdown = ({
         onPress={() => setIsOpen(true)}
       >
         <View style={styles.buttonContent}>
-          {selectedOption?.iconUrl && (
+          {(selectedOption?.iconUrl || selectedOption?.icon) && (
             <Image
-              source={{ uri: selectedOption.iconUrl }}
+              source={selectedOption.icon || { uri: selectedOption.iconUrl }}
               style={styles.icon}
               resizeMode="contain"
             />

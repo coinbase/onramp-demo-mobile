@@ -7,13 +7,25 @@ type ButtonProps = {
   onPress: () => void;
   variant?: "primary" | "danger";
   icon?: React.ReactNode;
+  disabled?: boolean;
 };
 
-const Button = ({ title, onPress, variant = "primary", icon }: ButtonProps) => {
+const Button = ({
+  title,
+  onPress,
+  variant = "primary",
+  icon,
+  disabled,
+}: ButtonProps) => {
   return (
     <TouchableOpacity
-      style={[styles.button, variant === "danger" && styles.dangerButton]}
+      style={[
+        styles.button,
+        variant === "danger" && styles.dangerButton,
+        disabled && styles.disabledButton,
+      ]}
       onPress={onPress}
+      disabled={disabled}
     >
       <View style={styles.content}>
         {icon}
@@ -42,6 +54,10 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
+  },
+  disabledButton: {
+    opacity: 0.5,
+    backgroundColor: "grey",
   },
 });
 

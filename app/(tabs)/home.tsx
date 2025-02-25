@@ -3,9 +3,8 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { WalletDetails } from "@/components/WalletDetails/WalletDetails";
-import { useWalletBalance } from "@/hooks/useWalletBalance";
-import { useEmbeddedEthereumWallet, usePrivy } from "@privy-io/expo";
-import { useEffect, useState } from "react";
+import { useWallet } from "@/hooks/useWallet";
+import { useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -15,18 +14,11 @@ import {
 
 export default function HomeScreen() {
   const [currency, setCurrency] = useState("USD");
-  const [amount, setAmount] = useState("20");
+  const [amount, setAmount] = useState("0");
   const [asset, setAsset] = useState("ETH");
-  const { user } = usePrivy();
-  const { wallets, create } = useEmbeddedEthereumWallet();
+  const [network, setNetwork] = useState("base");
 
-  const { balance, isLoading, error } = useWalletBalance();
-
-  useEffect(() => {
-    if (wallets.length === 0) {
-      create();
-    }
-  }, [wallets, create]);
+  const currentWallet = useWallet({ network });
 
   return (
     <KeyboardAvoidingView
@@ -46,10 +38,9 @@ export default function HomeScreen() {
           <ThemedText type="title">Coinbase Onramp Demo</ThemedText>
 
           <WalletDetails
-            chainType={wallets[0]?.chainType}
-            address={wallets[0]?.address}
-            balance={balance?.toString() || "Not available"}
-            isLoading={isLoading}
+            network={network}
+            address={currentWallet?.address}
+            onChangeNetwork={setNetwork}
           />
 
           <FundForm
@@ -59,8 +50,8 @@ export default function HomeScreen() {
             onChangeCurrency={setCurrency}
             onChangeAmount={setAmount}
             onChangeAsset={setAsset}
-            walletAddress={wallets[0]?.address}
-            walletChain={wallets[0]?.chainType}
+            walletAddress={currentWallet?.address || ""}
+            walletChain={network}
           />
         </ThemedView>
       </ParallaxScrollView>

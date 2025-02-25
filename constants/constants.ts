@@ -59,4 +59,34 @@ export const ASSET_OPTIONS = [
     value: "MATIC",
     iconUrl: "https://cryptologos.cc/logos/polygon-matic-logo.png",
   },
+  {
+    label: "Solana (SOL)",
+    value: "SOL",
+    iconUrl: "https://cryptologos.cc/logos/solana-sol-logo.png",
+  },
+];
+
+// TODO: Get network options using onramp utils from the Onchainkit, once onchainkit is available in react native
+export const NETWORK_OPTIONS = [
+  {
+    label: "Base",
+    value: "base",
+    iconUrl: null,
+    icon: require("@/assets/images/base-icon.jpeg"),
+  },
+  {
+    label: "Ethereum",
+    value: "ethereum",
+    iconUrl: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+  },
+  {
+    label: "Optimism",
+    value: "optimism",
+    iconUrl: "https://cryptologos.cc/logos/optimism-ethereum-op-logo.png",
+  },
+  {
+    label: "Solana",
+    value: "solana",
+    iconUrl: "https://cryptologos.cc/logos/solana-sol-logo.png",
+  },
 ];

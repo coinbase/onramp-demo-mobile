@@ -1,23 +1,28 @@
-import { NetworkIcon } from "@/components/NetworkIcon/NetworkIcon";
 import { ThemedText } from "@/components/ThemedText";
+import { NETWORK_OPTIONS } from "@/constants/constants";
+import { useWalletBalance } from "@/hooks/useWalletBalance";
 import { useState } from "react";
 import { Animated, Clipboard, Pressable, StyleSheet, View } from "react-native";
+import { Dropdown } from "../Dropdown/Dropdown";
+import { FormRow } from "../FormRow/FormRow";
 
 type WalletDetailsProps = {
-  chainType?: string;
+  network?: string;
   address?: string;
-  balance?: string;
-  isLoading?: boolean;
+  onChangeNetwork?: (network: string) => void;
 };
 
 export const WalletDetails = ({
-  chainType,
+  network,
   address,
-  balance,
-  isLoading,
+  onChangeNetwork,
 }: WalletDetailsProps) => {
   const [showCopied, setShowCopied] = useState(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
+
+  const { balance, isLoading, error } = useWalletBalance({
+    network: network as "ethereum" | "solana",
+  });
 
   const handleCopyAddress = async () => {
     if (address) {
@@ -40,51 +45,49 @@ export const WalletDetails = ({
   };
 
   return (
-    <View style={styles.walletCard}>
-      <View style={styles.walletHeader}>
-        <ThemedText style={styles.walletTitle}>Wallet Details</ThemedText>
-      </View>
+    <View style={styles.container}>
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <ThemedText style={styles.cardTitle}>Wallet Details</ThemedText>
+        </View>
 
-      <View style={styles.walletInfo}>
-        <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>Network</ThemedText>
-          <View style={styles.valueWithIcon}>
-            <NetworkIcon chainType={chainType} size={24} />
-            <ThemedText style={styles.value}>
-              {chainType || "Not connected"}
-            </ThemedText>
+        <View style={styles.cardContent}>
+          <FormRow label="Network">
+            <Dropdown
+              value={network || "base"}
+              onValueChange={onChangeNetwork || (() => {})}
+              options={NETWORK_OPTIONS}
+              placeholder="Select network"
+            />
+          </FormRow>
+
+          <View style={styles.divider} />
+
+          <View style={styles.infoRow}>
+            <ThemedText style={styles.label}>Address</ThemedText>
+            <Pressable
+              onPress={handleCopyAddress}
+              style={styles.addressContainer}
+            >
+              <ThemedText style={styles.value} numberOfLines={1}>
+                {address || "Not connected"}
+              </ThemedText>
+              {showCopied && (
+                <Animated.View
+                  style={[styles.copiedBadge, { opacity: fadeAnim }]}
+                >
+                  <ThemedText style={styles.copiedText}>Copied!</ThemedText>
+                </Animated.View>
+              )}
+            </Pressable>
           </View>
-        </View>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>Address</ThemedText>
-          <Pressable
-            onPress={handleCopyAddress}
-            style={styles.addressContainer}
-          >
-            <ThemedText style={styles.value} numberOfLines={1}>
-              {address || "Not connected"}
-            </ThemedText>
-            {showCopied && (
-              <Animated.View
-                style={[styles.copiedBadge, { opacity: fadeAnim }]}
-              >
-                <ThemedText style={styles.copiedText}>Copied!</ThemedText>
-              </Animated.View>
-            )}
-          </Pressable>
-        </View>
-
-        <View style={styles.divider} />
-
-        <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>Balance</ThemedText>
-
-          <ThemedText style={styles.value}>
-            {balance || "Not available"}
-          </ThemedText>
+          <View style={styles.infoRow}>
+            <ThemedText style={styles.label}>Balance</ThemedText>
+            <ThemedText style={styles.value}>{balance}</ThemedText>
+          </View>
         </View>
       </View>
     </View>
@@ -92,22 +95,25 @@ export const WalletDetails = ({
 };
 
 const styles = StyleSheet.create({
-  walletCard: {
+  container: {
+    flex: 1,
+  },
+  card: {
     backgroundColor: "#ffffff10",
     borderRadius: 16,
     overflow: "hidden",
     marginBottom: 24,
   },
-  walletHeader: {
+  cardHeader: {
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#ffffff15",
   },
-  walletTitle: {
+  cardTitle: {
     fontSize: 18,
     fontWeight: "600",
   },
-  walletInfo: {
+  cardContent: {
     padding: 16,
     gap: 16,
   },

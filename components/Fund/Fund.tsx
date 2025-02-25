@@ -55,6 +55,7 @@ export const Fund = ({
         title="Fund with Coinbase"
         onPress={handlePressFund}
         variant="primary"
+        disabled={Number(amount) === 0}
         icon={
           <MaterialIcons
             name="currency-exchange"

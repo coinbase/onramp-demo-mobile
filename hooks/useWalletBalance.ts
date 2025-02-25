@@ -1,30 +1,52 @@
-import { useEmbeddedEthereumWallet } from "@privy-io/expo";
+import {
+  SolanaClient,
+  useEmbeddedEthereumWallet,
+  useEmbeddedSolanaWallet,
+} from "@privy-io/expo";
 import { useCallback, useEffect, useState } from "react";
 
-export const useWalletBalance = () => {
+export const useWalletBalance = ({
+  network,
+}: {
+  network: "ethereum" | "solana";
+}) => {
   const [balance, setBalance] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error>();
-  const { wallets } = useEmbeddedEthereumWallet();
+  const { wallets: ethWallets } = useEmbeddedEthereumWallet();
+  const { wallets: solWallets } = useEmbeddedSolanaWallet();
 
   const fetchBalance = useCallback(async () => {
-    if (wallets.length === 0) return;
+    if (network === "ethereum" && ethWallets.length === 0) return;
+    if (network === "solana" && solWallets?.length === 0) return;
 
     setIsLoading(true);
     setError(undefined);
 
     try {
-      const wallet = wallets[0];
-      const balanceInWei = await (
-        await wallet.getProvider()
-      ).request({
-        method: "eth_getBalance",
-        params: [wallet.address, "latest"],
-      });
+      if (network === "solana") {
+        const wallet = solWallets?.[0];
 
-      // Convert hex string to decimal and then to ETH
-      const balanceInEth = parseInt(balanceInWei, 16) / 1e18;
-      setBalance(balanceInEth.toFixed(8) + " ETH");
+        const solanaClient = new SolanaClient({
+          name: "mainnet-beta",
+          rpcUrl: "https://api.mainnet-beta.solana.com",
+        });
+
+        const balance = await solanaClient.getBalance(wallet?.address || "");
+
+        const balanceInSol = Number(balance) / 1e9;
+
+        setBalance(balanceInSol.toFixed(8) + " SOL");
+      } else {
+        const wallet = ethWallets[0];
+        const provider = await wallet?.getProvider();
+        const balanceInWei = await provider?.request({
+          method: "eth_getBalance",
+          params: [wallet.address, "latest"],
+        });
+        const balanceInEth = parseInt(balanceInWei || "0", 16) / 1e18;
+        setBalance(balanceInEth.toFixed(8) + " ETH");
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err : new Error("Failed to fetch balance")
@@ -32,12 +54,13 @@ export const useWalletBalance = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [wallets]);
+  }, [ethWallets, solWallets, network]);
 
   // Fetch on mount and when wallet changes
   useEffect(() => {
+    console.log("fetching balance");
     fetchBalance();
-  }, [fetchBalance]);
+  }, [fetchBalance, network]);
 
   // Poll balance every 10 seconds
   useEffect(() => {
