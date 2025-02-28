@@ -58,7 +58,6 @@ export const useWalletBalance = ({
 
   // Fetch on mount and when wallet changes
   useEffect(() => {
-    console.log("fetching balance");
     fetchBalance();
   }, [fetchBalance, network]);
 

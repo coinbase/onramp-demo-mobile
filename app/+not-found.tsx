@@ -7,7 +7,6 @@ import React from "react";
 
 export default function NotFoundScreen() {
   const pathname = usePathname();
-  console.log("pathname", pathname);
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />

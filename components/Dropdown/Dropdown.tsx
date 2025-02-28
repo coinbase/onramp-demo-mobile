@@ -1,177 +1,208 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import React, { memo, useCallback, useMemo } from "react";
 import {
-  FlatList,
   Image,
   ImageSourcePropType,
-  Modal,
-  Pressable,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useBottomSheet } from "../BottomSheet/BottomSheetProvider";
 import { ThemedText } from "../ThemedText";
 
-type DropdownOption = {
+type DropdownOption<T> = {
+  id: string;
   label: string;
-  value: string;
+  value: T;
   iconUrl?: string;
   icon?: ImageSourcePropType;
+  Icon?: React.ComponentType<{
+    width: number;
+    height: number;
+    style: any;
+    color?: string;
+  }>;
+  description?: string;
 };
 
-type DropdownProps = {
-  value: string;
-  onValueChange: (value: string) => void;
-  options: DropdownOption[];
+type DropdownProps<T extends DropdownOption<T>> = {
+  value: T;
+  onValueChange: (value: T) => void;
+  options: T[];
   placeholder?: string;
   hint?: string;
+  title?: string;
+  isSelected: (option: T) => boolean;
 };
 
-export const Dropdown = ({
-  value,
-  onValueChange,
-  options,
-  placeholder = "Select an option",
-  hint,
-}: DropdownProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const textColor = useThemeColor({}, "text");
-  const backgroundColor = useThemeColor({}, "background");
+export const Dropdown = memo(
+  <T extends DropdownOption<T>>({
+    value,
+    onValueChange,
+    options,
+    placeholder = "Select an option",
+    hint,
+    title,
+    isSelected,
+  }: DropdownProps<T>) => {
+    const { showBottomSheet, hideBottomSheet } = useBottomSheet();
+    const textColor = useThemeColor({}, "text");
+    const secondaryColor = useThemeColor({}, "secondary");
+    const backgroundColor = useThemeColor({}, "background");
+    const foregroundMuted = useThemeColor({}, "foregroundMuted");
+    const insets = useSafeAreaInsets();
 
-  const selectedOption = options.find((option) => option.value === value);
+    const selectedOption = useMemo(
+      () => options.find(isSelected),
+      [options, value]
+    );
 
-  const renderOption = (option: DropdownOption) => (
-    <TouchableOpacity
-      style={styles.option}
-      onPress={() => {
-        onValueChange(option.value);
-        setIsOpen(false);
-      }}
-    >
-      <View style={styles.optionContent}>
-        {(option.iconUrl || option.icon) && (
-          <Image
-            source={option.icon || { uri: option.iconUrl }}
-            style={styles.icon}
-            resizeMode="contain"
-          />
-        )}
-        <ThemedText
-          style={[
-            styles.optionText,
-            option.value === value && styles.selectedOption,
-          ]}
-        >
-          {option.label}
-        </ThemedText>
-      </View>
-      {option.value === value && (
-        <Ionicons name="checkmark" size={20} color={textColor} />
-      )}
-    </TouchableOpacity>
-  );
-
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.button, { borderColor: "#E6E8EB" }]}
-        onPress={() => setIsOpen(true)}
-      >
-        <View style={styles.buttonContent}>
-          {(selectedOption?.iconUrl || selectedOption?.icon) && (
-            <Image
-              source={selectedOption.icon || { uri: selectedOption.iconUrl }}
-              style={styles.icon}
-              resizeMode="contain"
-            />
+    const renderContent = useCallback(
+      () => (
+        <BottomSheetFlatList
+          data={options}
+          ListHeaderComponent={() => (
+            <ThemedText style={styles.option} font="medium" type="subtitle">
+              {title}
+            </ThemedText>
           )}
-          <ThemedText style={styles.buttonText}>
-            {selectedOption?.label || placeholder}
-          </ThemedText>
-        </View>
-        <Ionicons
-          name="chevron-down"
-          size={20}
-          color={textColor}
-          style={styles.chevron}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => {
+                onValueChange(item.value);
+                hideBottomSheet();
+              }}
+            >
+              <View style={styles.option}>
+                <View style={styles.optionContent}>
+                  {item.Icon ? (
+                    <item.Icon
+                      width={32}
+                      height={32}
+                      style={{ marginRight: 12 }}
+                      color={textColor}
+                    />
+                  ) : (
+                    (item.iconUrl || item.icon) && (
+                      <Image
+                        source={item.icon || { uri: item.iconUrl }}
+                        style={[{ width: 32, height: 32, marginRight: 12 }]}
+                        resizeMode="contain"
+                      />
+                    )
+                  )}
+                  <View style={{ flexDirection: "column" }}>
+                    <ThemedText font="medium">{item.label}</ThemedText>
+                    {item.description && (
+                      <ThemedText style={[{ color: foregroundMuted }]}>
+                        {item.description}
+                      </ThemedText>
+                    )}
+                  </View>
+                </View>
+                {isSelected(item) && (
+                  <Ionicons name="checkmark" size={24} color={textColor} />
+                )}
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => JSON.stringify(item.value)}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          contentContainerStyle={{
+            paddingBottom: insets.bottom,
+            backgroundColor: backgroundColor,
+          }}
         />
-      </TouchableOpacity>
+      ),
+      [
+        backgroundColor,
+        insets.bottom,
+        options,
+        textColor,
+        title,
+        isSelected,
+        onValueChange,
+        hideBottomSheet,
+      ]
+    );
 
-      {hint && <ThemedText style={styles.hint}>{hint}</ThemedText>}
-
-      <Modal visible={isOpen} transparent animationType="fade">
-        <Pressable style={styles.modalOverlay} onPress={() => setIsOpen(false)}>
-          <View
-            style={[styles.modalContent, { backgroundColor: backgroundColor }]}
-          >
-            <FlatList
-              data={options}
-              keyExtractor={(item) => item.value}
-              renderItem={({ item }) => renderOption(item)}
-            />
+    return (
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: secondaryColor }]}
+          onPress={() => showBottomSheet(renderContent())}
+        >
+          <View style={styles.buttonContent}>
+            {selectedOption?.Icon ? (
+              <selectedOption.Icon
+                width={24}
+                height={24}
+                style={styles.icon}
+                color={textColor}
+              />
+            ) : (
+              (selectedOption?.iconUrl || selectedOption?.icon) && (
+                <Image
+                  source={
+                    selectedOption.icon || { uri: selectedOption.iconUrl }
+                  }
+                  style={styles.icon}
+                  resizeMode="contain"
+                />
+              )
+            )}
+            <ThemedText>{selectedOption?.label || placeholder}</ThemedText>
           </View>
-        </Pressable>
-      </Modal>
-    </View>
-  );
-};
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={textColor}
+            style={styles.chevron}
+          />
+        </TouchableOpacity>
+
+        {hint && <ThemedText style={styles.hint}>{hint}</ThemedText>}
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
     gap: 4,
-    width: "100%",
   },
   button: {
     height: 40,
-    borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  buttonText: {
-    fontSize: 16,
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   icon: {
     width: 24,
     height: 24,
     marginRight: 8,
-    borderRadius: 12,
   },
   hint: {
     fontSize: 12,
     opacity: 0.5,
     marginLeft: 4,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    justifyContent: "center",
-    padding: 20,
-  },
-  modalContent: {
-    borderRadius: 16,
-    maxHeight: "80%",
-  },
   option: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ffffff15",
-  },
-  optionText: {
-    fontSize: 16,
-  },
-  selectedOption: {
-    fontWeight: "600",
-  },
-  buttonContent: {
-    flexDirection: "row",
-    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
   },
   optionContent: {
     flexDirection: "row",

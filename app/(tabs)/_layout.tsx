@@ -1,19 +1,19 @@
 import { Tabs } from "expo-router";
 import React from "react";
 
+import WalletIcon from "@/assets/icons/WalletIcon";
 import { HapticTab } from "@/components/HapticTab";
+import { ThemedText } from "@/components/ThemedText";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const primaryColor = useThemeColor({}, "primary");
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -26,17 +26,45 @@ export default function TabLayout() {
         name="home"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol
+              size={28}
+              name="house.fill"
+              color={focused ? primaryColor : color}
+            />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <ThemedText
+              style={{
+                fontSize: 12,
+                color: focused ? primaryColor : color,
+              }}
+            >
+              Home
+            </ThemedText>
           ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="wallet"
         options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.fill" color={color} />
+          title: "Wallet",
+          tabBarIcon: ({ color, focused }) => (
+            <WalletIcon
+              width={28}
+              height={28}
+              color={focused ? primaryColor : color}
+            />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <ThemedText
+              style={{
+                fontSize: 12,
+                color: focused ? primaryColor : color,
+              }}
+            >
+              Wallet
+            </ThemedText>
           ),
         }}
       />

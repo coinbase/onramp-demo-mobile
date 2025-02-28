@@ -1,6 +1,13 @@
 {
   "colors" : [
     {
+      "color" : {
+        "color-space" : "gray-gamma-22",
+        "components" : {
+          "alpha" : "0.600",
+          "white" : "0.395"
+        }
+      },
       "idiom" : "universal"
     }
   ],

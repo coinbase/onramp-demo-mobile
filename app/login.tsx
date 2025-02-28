@@ -1,9 +1,17 @@
+import OnrampBrandLogo from "@/assets/images/OnrampBrandLogo";
+import OnrampBrandLogoDark from "@/assets/images/OnrampBrandLogoDark";
 import { ThemedText } from "@/components/ThemedText";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useApp } from "@/context/AppContext";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { OAuthProviderType, useLoginWithOAuth } from "@privy-io/expo";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type LoginMethod = {
@@ -34,22 +42,28 @@ const LOGIN_METHODS: LoginMethod[] = [
   },
   {
     id: "twitter",
-    name: "twitter",
-    icon: "twitter",
+    name: "X",
+    icon: "x-twitter",
     color: "#1DA1F2",
   },
 ];
 
 export default function LoginScreen() {
-  // const { login } = useLogin();
+  const theme = useColorScheme() ?? "light";
+  const secondary = useThemeColor({}, "secondary");
+  const foreground = useThemeColor({}, "foreground");
   const insets = useSafeAreaInsets();
   const { login } = useLoginWithOAuth();
+  const { setAppLoading, setAppLoadingMessage } = useApp();
 
   const handleLogin = async (loginProvider: OAuthProviderType) => {
     try {
+      setAppLoading(true);
+      setAppLoadingMessage("Logging in...");
       await login({
         provider: loginProvider,
       });
+      setAppLoading(false);
       router.replace("/(tabs)/home");
     } catch (error) {
       if (
@@ -60,26 +74,18 @@ export default function LoginScreen() {
       } else {
         console.error("Login failed:", error);
       }
+    } finally {
+      setAppLoading(false);
     }
   };
 
   return (
-    <LinearGradient
-      colors={["#1D3D47", "#0A1A1F"]}
-      style={[styles.container, { paddingTop: insets.top + 40 }]}
-    >
+    <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Image
-            source={require("@/assets/images/onramp-logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to Onramp Demo
-          </ThemedText>
+          {theme === "light" ? <OnrampBrandLogo /> : <OnrampBrandLogoDark />}
           <ThemedText style={styles.subtitle}>
-            Your gateway to coinbase onramp solution
+            This is a demo app of how the Coinbase Onramp works
           </ThemedText>
         </View>
 
@@ -87,17 +93,20 @@ export default function LoginScreen() {
           {LOGIN_METHODS.map((method) => (
             <TouchableOpacity
               key={method.id}
-              style={[styles.button, { backgroundColor: method.color }]}
+              style={[styles.button, { backgroundColor: secondary }]}
               onPress={() => handleLogin(method.id)}
             >
-              <MaterialCommunityIcons
+              <ThemedText
+                font="medium"
+                style={[styles.buttonText, { color: foreground }]}
+              >
+                Sign in with {method.name}
+              </ThemedText>
+              <FontAwesome6
                 name={method.icon as any}
                 size={24}
-                color="#FFFFFF"
+                color={foreground}
               />
-              <ThemedText style={styles.buttonText}>
-                Continue with {method.name}
-              </ThemedText>
             </TouchableOpacity>
           ))}
         </View>
@@ -108,7 +117,7 @@ export default function LoginScreen() {
           By continuing, you agree to our Terms of Service and Privacy Policy
         </ThemedText>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -125,11 +134,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 48,
   },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 24,
-  },
   title: {
     fontSize: 28,
     fontWeight: "700",
@@ -140,6 +144,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     opacity: 0.7,
     textAlign: "center",
+    paddingVertical: 24,
   },
   loginButtons: {
     gap: 12,
@@ -147,12 +152,16 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     gap: 12,
+    //backgroundColor: "#ffffff10",
+
+    overflow: "hidden",
   },
   buttonText: {
-    color: "#FFFFFF",
+    //color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },

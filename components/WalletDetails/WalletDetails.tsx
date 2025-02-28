@@ -1,28 +1,18 @@
+import { NetworkDropdown } from "@/components/NetworkDropdown/NetworkDropdown";
 import { ThemedText } from "@/components/ThemedText";
-import { NETWORK_OPTIONS } from "@/constants/constants";
-import { useWalletBalance } from "@/hooks/useWalletBalance";
-import { useState } from "react";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import React, { memo, useState } from "react";
 import { Animated, Clipboard, Pressable, StyleSheet, View } from "react-native";
-import { Dropdown } from "../Dropdown/Dropdown";
-import { FormRow } from "../FormRow/FormRow";
+import { RowSpaceBetween } from "../blocks/RowSpaceBetween";
 
 type WalletDetailsProps = {
-  network?: string;
   address?: string;
-  onChangeNetwork?: (network: string) => void;
 };
 
-export const WalletDetails = ({
-  network,
-  address,
-  onChangeNetwork,
-}: WalletDetailsProps) => {
+export const WalletDetails = memo(({ address }: WalletDetailsProps) => {
   const [showCopied, setShowCopied] = useState(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
-
-  const { balance, isLoading, error } = useWalletBalance({
-    network: network as "ethereum" | "solana",
-  });
+  const foregroundMuted = useThemeColor({}, "foregroundMuted");
 
   const handleCopyAddress = async () => {
     if (address) {
@@ -45,100 +35,40 @@ export const WalletDetails = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <ThemedText style={styles.cardTitle}>Wallet Details</ThemedText>
-        </View>
+    <>
+      <RowSpaceBetween containerStyle={{ marginBottom: 16 }}>
+        <ThemedText font="medium" type="subtitle">
+          Wallet details
+        </ThemedText>
+        <NetworkDropdown />
+      </RowSpaceBetween>
 
-        <View style={styles.cardContent}>
-          <FormRow label="Network">
-            <Dropdown
-              value={network || "base"}
-              onValueChange={onChangeNetwork || (() => {})}
-              options={NETWORK_OPTIONS}
-              placeholder="Select network"
-            />
-          </FormRow>
-
-          <View style={styles.divider} />
-
-          <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Address</ThemedText>
-            <Pressable
-              onPress={handleCopyAddress}
-              style={styles.addressContainer}
-            >
-              <ThemedText style={styles.value} numberOfLines={1}>
-                {address || "Not connected"}
-              </ThemedText>
-              {showCopied && (
-                <Animated.View
-                  style={[styles.copiedBadge, { opacity: fadeAnim }]}
-                >
-                  <ThemedText style={styles.copiedText}>Copied!</ThemedText>
-                </Animated.View>
-              )}
-            </Pressable>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Balance</ThemedText>
-            <ThemedText style={styles.value}>{balance}</ThemedText>
-          </View>
-        </View>
+      <View style={styles.walletAddressContainer}>
+        <ThemedText
+          font="medium"
+          style={{ color: foregroundMuted, paddingBottom: 8 }}
+        >
+          wallet address
+        </ThemedText>
+        <Pressable onPress={handleCopyAddress}>
+          <ThemedText numberOfLines={1}>
+            {address || "Not connected"}
+          </ThemedText>
+          {showCopied && (
+            <Animated.View style={[styles.copiedBadge, { opacity: fadeAnim }]}>
+              <ThemedText style={styles.copiedText}>Copied!</ThemedText>
+            </Animated.View>
+          )}
+        </Pressable>
       </View>
-    </View>
+    </>
   );
-};
+});
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  card: {
-    backgroundColor: "#ffffff10",
-    borderRadius: 16,
-    overflow: "hidden",
-    marginBottom: 24,
-  },
-  cardHeader: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ffffff15",
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  cardContent: {
-    padding: 16,
-    gap: 16,
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  label: {
-    fontSize: 16,
-    opacity: 0.7,
-    flex: 1,
-  },
-  value: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#ffffff15",
-  },
-  addressContainer: {
-    flex: 2,
-    position: "relative",
-    alignItems: "flex-end",
+  walletAddressContainer: {
+    flexDirection: "column",
+    height: 100,
   },
   copiedBadge: {
     position: "absolute",
@@ -153,12 +83,5 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "500",
-  },
-  valueWithIcon: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    flex: 2,
-    justifyContent: "flex-end",
   },
 });

@@ -1,125 +1,207 @@
-import { AmountInput } from "@/components/AmountInput/AmountInput";
+import { Divider } from "@/components/blocks/Divider";
+import { RowSpaceBetween } from "@/components/blocks/RowSpaceBetween";
+import { Card } from "@/components/Card/Card";
 import { Dropdown } from "@/components/Dropdown/Dropdown";
-import { FormRow } from "@/components/FormRow/FormRow";
 import { Fund } from "@/components/Fund/Fund";
+import { AmountInput } from "@/components/FundForm/components/AmountInput";
+import { NetworkDropdown } from "@/components/NetworkDropdown/NetworkDropdown";
 import { ThemedText } from "@/components/ThemedText";
-import { ASSET_OPTIONS, CURRENCY_OPTIONS } from "@/constants/constants";
+import { PAYMENT_METHOD_OPTIONS } from "@/constants/constants";
+import {
+  OnrampPaymentCurrency,
+  OnrampPurchaseCurrency,
+} from "@/constants/types";
+import { useApp } from "@/context/AppContext";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
+import { getCurrencyIcon } from "@/utils/getCurrencyIcon";
+import { getCurrencySymbol } from "@/utils/getCurrencySymbol";
+import { getPaymentMethodIcon } from "@/utils/getPaymentMethodIcon";
+import { memo, useCallback, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-
-const getCurrencySymbol = (currency: string): string => {
-  const symbols: { [key: string]: string } = {
-    USD: "$",
-    EUR: "€",
-    GBP: "£",
-    JPY: "¥",
-    CAD: "C$",
-  };
-  return symbols[currency] || currency;
-};
+import { useAmountInput } from "./hooks/useAmountInput";
 
 type FundFormProps = {
-  currency: string;
-  amount: string;
-  asset: string;
   walletAddress: string;
-  walletChain: string;
-  onChangeCurrency: (value: string) => void;
-  onChangeAmount: (value: string) => void;
-  onChangeAsset: (value: string) => void;
 };
 
-export const FundForm = ({
-  currency,
-  amount,
-  asset,
-  walletAddress,
-  walletChain,
-  onChangeCurrency,
-  onChangeAmount,
-  onChangeAsset,
-}: FundFormProps) => {
+export const FundForm = memo(({ walletAddress }: FundFormProps) => {
+  const {
+    currency,
+    fiatAmount,
+    cryptoAmount,
+    asset,
+    network,
+    paymentMethod,
+    setCurrency,
+    setFiatAmount,
+    setCryptoAmount,
+    setAsset,
+    setNetwork,
+    setPaymentMethod,
+    exchangeRate,
+    setExchangeRate,
+    country,
+    subdivision,
+    paymentCurrencies,
+    purchaseCurrencies,
+    dataLoading,
+    setAppLoading,
+  } = useApp();
+
+  const foregroundMuted = useThemeColor({}, "foregroundMuted");
+
+  const { handleFiatChange, handleCryptoChange } = useAmountInput({
+    setFiatAmount,
+    setCryptoAmount,
+  });
+
+  const handleChangeAsset = useCallback(
+    async (asset: OnrampPurchaseCurrency) => {
+      setAppLoading(true);
+      setAsset(asset);
+
+      const exchangeRate = await fetchExchangeRate({
+        asset: asset!,
+        currency: currency!,
+        country,
+        subdivision,
+      });
+
+      handleFiatChange(fiatAmount, exchangeRate);
+
+      setNetwork(asset.networks[0]);
+
+      setExchangeRate(exchangeRate);
+
+      setAppLoading(false);
+    },
+    [currency, country, subdivision, fiatAmount, asset]
+  );
+
+  const handleChangeCurrency = useCallback(
+    async (currency: OnrampPaymentCurrency) => {
+      setAppLoading(true);
+      setCurrency(currency);
+
+      // Fetch the exchange rate
+      const exchangeRate = await fetchExchangeRate({
+        asset: asset!,
+        currency,
+        country,
+        subdivision,
+      });
+
+      handleCryptoChange(cryptoAmount, exchangeRate);
+
+      setExchangeRate(exchangeRate);
+
+      setAppLoading(false);
+    },
+    [currency, country, subdivision, cryptoAmount, asset]
+  );
+
+  const assetList = useMemo(() => {
+    return purchaseCurrencies
+      .filter((currency) =>
+        currency.networks.some((n) => n.name === network?.name)
+      )
+      .map((currency) => ({
+        id: currency.id,
+        label: currency.symbol,
+        value: currency,
+        iconUrl: currency.iconUrl,
+      }));
+  }, [purchaseCurrencies, network]);
+
   return (
     <View style={styles.container}>
-      {/* Payment details card */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <ThemedText style={styles.cardTitle}>Payment Details</ThemedText>
-        </View>
+      <Card bordered={true}>
+        <ThemedText style={{ color: foregroundMuted }}>Buy</ThemedText>
 
-        <View style={styles.cardContent}>
-          <FormRow label="Pay with">
-            <Dropdown
-              value={currency}
-              onValueChange={onChangeCurrency}
-              options={CURRENCY_OPTIONS}
-              placeholder="Select currency"
-            />
-          </FormRow>
+        <RowSpaceBetween>
+          <AmountInput
+            value={fiatAmount}
+            onChangeText={(value) => handleFiatChange(value, exchangeRate)}
+            prefix={getCurrencySymbol(currency?.id || "")}
+            isLoading={dataLoading}
+          />
 
-          <View style={styles.divider} />
+          <Dropdown<any>
+            title="Select currency"
+            value={currency}
+            onValueChange={handleChangeCurrency}
+            isSelected={(option) => option.id === currency?.id}
+            options={paymentCurrencies.map((currency) => ({
+              id: currency.id,
+              label: currency.id,
+              value: currency,
+              iconUrl: getCurrencyIcon(currency.id, 32),
+            }))}
+          />
+        </RowSpaceBetween>
 
-          <FormRow label="Receive">
-            <Dropdown
-              value={asset}
-              onValueChange={onChangeAsset}
-              options={ASSET_OPTIONS}
-              placeholder="Select asset"
-            />
-          </FormRow>
-        </View>
-      </View>
+        <Divider />
 
-      {/* Amount input section */}
-      <View style={styles.amountSection}>
-        <AmountInput
-          value={amount}
-          onChangeText={onChangeAmount}
-          prefix={getCurrencySymbol(currency)}
-          currency={currency}
-        />
-      </View>
+        <ThemedText style={{ color: foregroundMuted }}>Receive</ThemedText>
 
-      {/* Fund button */}
+        <RowSpaceBetween>
+          <AmountInput
+            value={cryptoAmount}
+            onChangeText={(value) => handleCryptoChange(value, exchangeRate)}
+            isLoading={dataLoading}
+          />
+
+          <Dropdown<any>
+            title="Select asset"
+            value={asset}
+            onValueChange={handleChangeAsset}
+            isSelected={(option) => option.id === asset?.id}
+            options={assetList}
+          />
+        </RowSpaceBetween>
+
+        <Divider />
+
+        <RowSpaceBetween>
+          <ThemedText style={{ color: foregroundMuted }}>Network</ThemedText>
+
+          <NetworkDropdown />
+        </RowSpaceBetween>
+      </Card>
+
+      <Card bordered={true}>
+        <RowSpaceBetween>
+          <ThemedText style={{ color: foregroundMuted }}>Pay with</ThemedText>
+
+          <Dropdown<any>
+            title="Pay with"
+            value={paymentMethod}
+            onValueChange={setPaymentMethod}
+            isSelected={(option) => option.id === paymentMethod?.id}
+            options={PAYMENT_METHOD_OPTIONS.map((option) => ({
+              id: option.id,
+              label: option.displayName,
+              value: option,
+              Icon: getPaymentMethodIcon(option.id),
+            }))}
+          />
+        </RowSpaceBetween>
+      </Card>
+
       <Fund
-        currency={currency}
-        amount={amount}
-        asset={asset}
+        currency={currency?.id}
+        amount={fiatAmount}
+        asset={asset?.symbol}
         walletAddress={walletAddress}
-        walletChain={walletChain}
+        walletChain={network?.name || "base"}
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
     gap: 24,
-  },
-  amountSection: {
-    backgroundColor: "#ffffff10",
-    borderRadius: 16,
-    paddingVertical: 16,
-  },
-  card: {
-    backgroundColor: "#ffffff10",
-    borderRadius: 16,
-    overflow: "hidden",
-  },
-  cardHeader: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ffffff15",
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  cardContent: {
-    padding: 16,
-    gap: 16,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#ffffff15",
   },
 });

@@ -5,11 +5,11 @@
     "scheme": "onrampdemo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/onramp.png",
+    "icon": "./assets/images/onramp.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/onramp.png",
+      "image": "./assets/images/onramp.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,14 +18,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.coinbase.onramp.demo"
+      "bundleIdentifier": "com.coinbase.onramp.demo",
+      "scheme": "onrampdemo"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/onramp.png",
+        "foregroundImage": "./assets/images/onramp.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.coinbase.onramp.demo"
+      "package": "com.coinbase.onramp.demo",
+      "scheme": "onrampdemo"
     },
     "web": {
       "favicon": "./assets/favicon.png"

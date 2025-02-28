@@ -5,6 +5,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@coinbase/onchainkit/fund": [
+        "./node_modules/@coinbase/onchainkit/src/fund"
       ]
     }
   },

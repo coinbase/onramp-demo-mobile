@@ -1,0 +1,20 @@
+0 verbose cli /Users/rustam/.nvm/versions/node/v20.15.1/bin/node /Users/rustam/.nvm/versions/node/v20.15.1/bin/npm
+1 info using npm@10.7.0
+2 info using node@v20.15.1
+3 silly config:load:file:/Users/rustam/.nvm/versions/node/v20.15.1/lib/node_modules/npm/npmrc
+4 silly config:load:file:/Users/rustam/workspace/onramp/onramp-demo-mobile/.npmrc
+5 silly config:load:file:/Users/rustam/.npmrc
+6 silly config:load:file:/Users/rustam/.nvm/versions/node/v20.15.1/etc/npmrc
+7 verbose title npm run lint node_modules/.cache/eslint/
+8 verbose argv "run" "lint" "--cache" "--cache-location" "node_modules/.cache/eslint/"
+9 verbose logfile logs-max:10 dir:/Users/rustam/workspace/onramp/onramp-demo-mobile/--cache-location/_logs/2025-02-27T19_26_00_034Z-
+10 verbose logfile /Users/rustam/workspace/onramp/onramp-demo-mobile/--cache-location/_logs/2025-02-27T19_26_00_034Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET 200 https://registry.npmjs.org/npm 226ms
+13 notice
+13 notice New [31mmajor[39m version of npm available! [31m10.7.0[39m -> [34m11.1.0[39m
+13 notice Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.1.0[39m
+13 notice To update run: [4mnpm install -g npm@11.1.0[24m
+13 notice  { force: true, [Symbol(proc-log.meta)]: true }
+14 verbose exit 1
+15 verbose code 1
