@@ -4,7 +4,7 @@ import { OnrampNetwork } from "@/constants/types";
 import { useApp } from "@/context/AppContext";
 import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
 import { getNetworkIcon } from "@/utils/getNetworkIcon";
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import { useAmountInput } from "../FundForm/hooks/useAmountInput";
 
 export const NetworkDropdown = memo(() => {
@@ -82,22 +82,26 @@ export const NetworkDropdown = memo(() => {
     ]
   );
 
+  const networkList = useMemo(() => {
+    return allNetworks
+      ?.filter((n) => asset?.networks.some((n) => n.name === n.name))
+      .map((network) => ({
+        id: network.chainId,
+        name: network.name,
+        label: network.displayName,
+        value: network,
+        iconUrl: getNetworkIcon(network.name),
+        Icon: getNetworkIconComponent(network.name),
+      }));
+  }, [allNetworks, asset]);
+
   return (
     <Dropdown
       title="Select network"
       value={network}
       onValueChange={handleChangeNetwork}
       isSelected={(option) => option.value === network}
-      options={
-        allNetworks?.map((network) => ({
-          id: network.chainId,
-          name: network.name,
-          label: network.displayName,
-          value: network,
-          iconUrl: getNetworkIcon(network.chainId),
-          Icon: getNetworkIconComponent(network.name),
-        })) ?? []
-      }
+      options={networkList ?? []}
     />
   );
 });

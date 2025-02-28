@@ -47,6 +47,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
     purchaseCurrencies,
     dataLoading,
     setAppLoading,
+    allNetworks,
   } = useApp();
 
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
@@ -70,7 +71,10 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
 
       handleFiatChange(fiatAmount, exchangeRate);
 
-      setNetwork(asset.networks[0]);
+      // Check if the asset is supported on the current network. If not, set the network to the first network that supports the asset
+      if (!asset.networks.some((n) => n.name === network?.name)) {
+        setNetwork(asset.networks[0]);
+      }
 
       setExchangeRate(exchangeRate);
 
