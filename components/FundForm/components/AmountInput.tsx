@@ -32,6 +32,7 @@ export const AmountInput = memo(
             placeholder="0"
             editable={true}
             selectTextOnFocus={true}
+            keyboardType="numeric"
           />
         </View>
       </View>

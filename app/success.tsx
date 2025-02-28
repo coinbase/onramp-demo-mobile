@@ -4,6 +4,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,6 +14,8 @@ export default function SuccessScreen() {
   const primaryColor = useThemeColor({}, "primary");
 
   useEffect(() => {
+    // Dismiss the browser when the screen is loaded
+    WebBrowser.dismissBrowser();
     // You can handle any success params from the URL here if needed
     // const { searchParams } = new URL(window.location.href);
   }, []);
