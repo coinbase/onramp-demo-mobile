@@ -19,7 +19,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.coinbase.onramp.demo",
-      "scheme": "onrampdemo"
+      "scheme": "onrampdemo",
+      "appleTeamId": "A8X4B658S4"
     },
     "android": {
       "adaptiveIcon": {

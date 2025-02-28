@@ -24,10 +24,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="myapp"/>
-        <data android:scheme="com.anonymous.onrampdemomobile"/>
-        <data android:scheme="com.your.packagename"/>
-        <data android:scheme="com.coinbase.onrampdemo"/>
+        <data android:scheme="onrampdemo"/>
         <data android:scheme="onrampdemo"/>
         <data android:scheme="com.coinbase.onramp.demo"/>
       </intent-filter>
