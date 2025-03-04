@@ -1,69 +1,143 @@
-import { NetworkDropdown } from "@/components/NetworkDropdown/NetworkDropdown";
 import { ThemedText } from "@/components/ThemedText";
+import { OnrampNetwork } from "@/constants/types";
+import { useApp } from "@/context/AppContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import React, { memo, useState } from "react";
-import { Animated, Clipboard, Pressable, StyleSheet, View } from "react-native";
+import React, { memo, useCallback, useState } from "react";
+import {
+  Animated,
+  Clipboard,
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 import { RowSpaceBetween } from "../blocks/RowSpaceBetween";
+import { Dropdown } from "../Dropdown/Dropdown";
 
 type WalletDetailsProps = {
   address?: string;
+  network?: string;
 };
 
-export const WalletDetails = memo(({ address }: WalletDetailsProps) => {
-  const [showCopied, setShowCopied] = useState(false);
-  const fadeAnim = useState(new Animated.Value(0))[0];
-  const foregroundMuted = useThemeColor({}, "foregroundMuted");
+export const WalletDetails = memo(
+  ({ address, network }: WalletDetailsProps) => {
+    const { allNetworks } = useApp();
 
-  const handleCopyAddress = async () => {
-    if (address) {
-      await Clipboard.setString(address);
-      setShowCopied(true);
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.delay(1500),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => setShowCopied(false));
-    }
-  };
+    const [showCopied, setShowCopied] = useState(false);
+    const fadeAnim = useState(new Animated.Value(0))[0];
+    const foregroundMuted = useThemeColor({}, "foregroundMuted");
 
-  return (
-    <>
-      <RowSpaceBetween containerStyle={{ marginBottom: 16 }}>
-        <ThemedText font="medium" type="subtitle">
-          Wallet details
-        </ThemedText>
-        <NetworkDropdown />
-      </RowSpaceBetween>
+    const [selectedNetwork, setSelectedNetwork] =
+      useState<OnrampNetwork | null>(allNetworks[0]);
 
-      <View style={styles.walletAddressContainer}>
-        <ThemedText
-          font="medium"
-          style={{ color: foregroundMuted, paddingBottom: 8 }}
-        >
-          wallet address
-        </ThemedText>
-        <Pressable onPress={handleCopyAddress}>
-          <ThemedText numberOfLines={1}>
-            {address || "Not connected"}
+    const handleCopyAddress = async () => {
+      if (address) {
+        await Clipboard.setString(address);
+        setShowCopied(true);
+        Animated.sequence([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.delay(1500),
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]).start(() => setShowCopied(false));
+      }
+    };
+
+    const iconRenderer = useCallback(
+      (option: OnrampNetwork, width = 32, height = 32) => {
+        if (!option) {
+          return null;
+        }
+        return (
+          <Image
+            source={{ uri: option.iconUrl }}
+            style={{ width, height, marginRight: 8 }}
+            resizeMode="contain"
+          />
+        );
+      },
+      []
+    );
+
+    const searchFunction = useCallback(
+      (query: string, options: OnrampNetwork[]) => {
+        return options.filter(
+          (option) =>
+            option.displayName.toLowerCase().includes(query.toLowerCase()) ||
+            option.name.toLowerCase().includes(query.toLowerCase())
+        );
+      },
+      []
+    );
+
+    const isSelected = useCallback(
+      (option: OnrampNetwork) => {
+        return option.name === selectedNetwork?.name;
+      },
+      [selectedNetwork]
+    );
+
+    const keySelector = useCallback(
+      (option: OnrampNetwork) => option?.name,
+      []
+    );
+
+    const labelSelector = useCallback(
+      (option: OnrampNetwork) => option?.displayName,
+      []
+    );
+
+    return (
+      <>
+        <RowSpaceBetween containerStyle={{ marginBottom: 16 }}>
+          <ThemedText font="medium" type="subtitle">
+            Wallet details
           </ThemedText>
-          {showCopied && (
-            <Animated.View style={[styles.copiedBadge, { opacity: fadeAnim }]}>
-              <ThemedText style={styles.copiedText}>Copied!</ThemedText>
-            </Animated.View>
-          )}
-        </Pressable>
-      </View>
-    </>
-  );
-});
+          <Dropdown
+            title="Select network"
+            value={selectedNetwork}
+            onValueChange={setSelectedNetwork}
+            isSelected={isSelected}
+            disabled={allNetworks.length === 1}
+            options={allNetworks}
+            searchFunction={searchFunction}
+            keySelector={keySelector}
+            labelSelector={labelSelector}
+            iconRenderer={iconRenderer}
+          />
+        </RowSpaceBetween>
+
+        <View style={styles.walletAddressContainer}>
+          <ThemedText
+            font="regular"
+            style={{ color: foregroundMuted, paddingBottom: 8 }}
+          >
+            {`${network} wallet address`}
+          </ThemedText>
+          <Pressable onPress={handleCopyAddress}>
+            <ThemedText numberOfLines={3}>
+              {address || "Not connected"}
+            </ThemedText>
+            {showCopied && (
+              <Animated.View
+                style={[styles.copiedBadge, { opacity: fadeAnim }]}
+              >
+                <ThemedText style={styles.copiedText}>Copied!</ThemedText>
+              </Animated.View>
+            )}
+          </Pressable>
+        </View>
+      </>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   walletAddressContainer: {

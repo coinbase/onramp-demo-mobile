@@ -1,45 +1,38 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Ionicons } from "@expo/vector-icons";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import React, { memo, useCallback, useMemo } from "react";
 import {
-  Image,
-  ImageSourcePropType,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+  BottomSheetFlatList,
+  BottomSheetTextInput,
+} from "@gorhom/bottom-sheet";
+import React, { memo, useMemo, useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomSheet } from "../BottomSheet/BottomSheetProvider";
 import { ThemedText } from "../ThemedText";
+import { ThemedView } from "../ThemedView";
 
-type DropdownOption<T> = {
-  id: string;
-  label: string;
-  value: T;
-  iconUrl?: string;
-  icon?: ImageSourcePropType;
-  Icon?: React.ComponentType<{
-    width: number;
-    height: number;
-    style: any;
-    color?: string;
-  }>;
-  description?: string;
-};
-
-type DropdownProps<T extends DropdownOption<T>> = {
-  value: T;
-  onValueChange: (value: T) => void;
-  options: T[];
+type DropdownProps = {
+  value: any;
+  onValueChange: (option: any) => void;
+  options: Array<any>;
   placeholder?: string;
   hint?: string;
   title?: string;
-  isSelected: (option: T) => boolean;
+  isSelected: (option: any) => boolean;
+  searchFunction?: (query: string, options: Array<any>) => Array<any>;
+  disabled?: boolean;
+  labelSelector?: (option: any) => string;
+  descriptionSelector?: (option: any) => string;
+  iconRenderer?: (
+    option: any,
+    width?: number,
+    height?: number
+  ) => React.ReactNode;
+  keySelector?: (option: any) => string;
 };
 
 export const Dropdown = memo(
-  <T extends DropdownOption<T>>({
+  ({
     value,
     onValueChange,
     options,
@@ -47,131 +40,204 @@ export const Dropdown = memo(
     hint,
     title,
     isSelected,
-  }: DropdownProps<T>) => {
+    searchFunction,
+    disabled = false,
+    labelSelector,
+    descriptionSelector,
+    iconRenderer,
+    keySelector,
+  }: DropdownProps) => {
     const { showBottomSheet, hideBottomSheet } = useBottomSheet();
     const textColor = useThemeColor({}, "text");
     const secondaryColor = useThemeColor({}, "secondary");
-    const backgroundColor = useThemeColor({}, "background");
-    const foregroundMuted = useThemeColor({}, "foregroundMuted");
-    const insets = useSafeAreaInsets();
 
     const selectedOption = useMemo(
       () => options.find(isSelected),
-      [options, value]
-    );
-
-    const renderContent = useCallback(
-      () => (
-        <BottomSheetFlatList
-          data={options}
-          ListHeaderComponent={() => (
-            <ThemedText style={styles.option} font="medium" type="subtitle">
-              {title}
-            </ThemedText>
-          )}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => {
-                onValueChange(item.value);
-                hideBottomSheet();
-              }}
-            >
-              <View style={styles.option}>
-                <View style={styles.optionContent}>
-                  {item.Icon ? (
-                    <item.Icon
-                      width={32}
-                      height={32}
-                      style={{ marginRight: 12 }}
-                      color={textColor}
-                    />
-                  ) : (
-                    (item.iconUrl || item.icon) && (
-                      <Image
-                        source={item.icon || { uri: item.iconUrl }}
-                        style={[{ width: 32, height: 32, marginRight: 12 }]}
-                        resizeMode="contain"
-                      />
-                    )
-                  )}
-                  <View style={{ flexDirection: "column" }}>
-                    <ThemedText font="medium">{item.label}</ThemedText>
-                    {item.description && (
-                      <ThemedText style={[{ color: foregroundMuted }]}>
-                        {item.description}
-                      </ThemedText>
-                    )}
-                  </View>
-                </View>
-                {isSelected(item) && (
-                  <Ionicons name="checkmark" size={24} color={textColor} />
-                )}
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => JSON.stringify(item.value)}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          contentContainerStyle={{
-            paddingBottom: insets.bottom,
-            backgroundColor: backgroundColor,
-          }}
-        />
-      ),
-      [
-        backgroundColor,
-        insets.bottom,
-        options,
-        textColor,
-        title,
-        isSelected,
-        onValueChange,
-        hideBottomSheet,
-      ]
+      [options, isSelected]
     );
 
     return (
-      <View style={styles.container}>
+      <View style={outerStyles.container}>
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: secondaryColor }]}
-          onPress={() => showBottomSheet(renderContent())}
-        >
-          <View style={styles.buttonContent}>
-            {selectedOption?.Icon ? (
-              <selectedOption.Icon
-                width={24}
-                height={24}
-                style={styles.icon}
-                color={textColor}
+          style={[
+            outerStyles.button,
+            { backgroundColor: secondaryColor },
+            disabled && { opacity: 0.5 },
+          ]}
+          onPress={() =>
+            !disabled &&
+            showBottomSheet(
+              <DropdownContent
+                title={title || "Select an option"}
+                options={options}
+                onValueChange={onValueChange as (value: unknown) => void}
+                isSelected={isSelected as (option: any) => boolean}
+                searchFunction={searchFunction}
+                keySelector={keySelector}
+                labelSelector={labelSelector}
+                descriptionSelector={descriptionSelector}
+                iconRenderer={iconRenderer}
               />
-            ) : (
-              (selectedOption?.iconUrl || selectedOption?.icon) && (
-                <Image
-                  source={
-                    selectedOption.icon || { uri: selectedOption.iconUrl }
-                  }
-                  style={styles.icon}
-                  resizeMode="contain"
-                />
-              )
-            )}
-            <ThemedText>{selectedOption?.label || placeholder}</ThemedText>
+            )
+          }
+          disabled={disabled}
+        >
+          <View style={outerStyles.buttonContent}>
+            {iconRenderer?.(selectedOption!, 24, 24)}
+
+            <ThemedText>
+              {labelSelector?.(selectedOption!) || placeholder}
+            </ThemedText>
           </View>
           <Ionicons
             name="chevron-down"
             size={20}
             color={textColor}
-            style={styles.chevron}
+            style={outerStyles.chevron}
           />
         </TouchableOpacity>
 
-        {hint && <ThemedText style={styles.hint}>{hint}</ThemedText>}
+        {hint && <ThemedText style={outerStyles.hint}>{hint}</ThemedText>}
       </View>
     );
   }
 );
 
-const styles = StyleSheet.create({
+type DropdownContentProps<T> = {
+  title: string;
+  options: Array<T>;
+  onValueChange: (option: T) => void;
+  isSelected: (option: T) => boolean;
+  labelSelector?: (option: T) => string;
+  descriptionSelector?: (option: T) => string;
+  iconRenderer?: (option: T) => React.ReactNode;
+  keySelector?: (option: T) => string;
+  searchFunction?: (query: string, options: Array<T>) => Array<T>;
+};
+
+const DropdownContent = memo(
+  <T,>({
+    title,
+    options,
+    onValueChange,
+    isSelected,
+    labelSelector,
+    descriptionSelector,
+    iconRenderer,
+    keySelector,
+    searchFunction,
+  }: DropdownContentProps<T>) => {
+    const insets = useSafeAreaInsets();
+    const { hideBottomSheet } = useBottomSheet();
+    const textColor = useThemeColor({}, "text");
+    const foregroundMuted = useThemeColor({}, "foregroundMuted");
+    const backgroundColor = useThemeColor({}, "background");
+    const backgroundAlternate = useThemeColor({}, "backgroundAlternate");
+    const borderColor = useThemeColor({}, "line");
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredOptions = useMemo(() => {
+      if (!searchQuery.trim()) {
+        return options;
+      }
+      return searchFunction?.(searchQuery, options) || options;
+    }, [options, searchQuery]);
+
+    return (
+      <View style={contentStyles.container}>
+        <ThemedView style={contentStyles.headerContainer}>
+          <ThemedText
+            style={contentStyles.headerTitle}
+            font="medium"
+            type="subtitle"
+          >
+            {title}
+          </ThemedText>
+          {searchFunction && (
+            <View
+              style={[
+                contentStyles.searchContainer,
+                {
+                  borderColor: borderColor,
+                  backgroundColor: backgroundAlternate,
+                },
+              ]}
+            >
+              <Ionicons
+                name="search"
+                size={20}
+                color={foregroundMuted}
+                style={contentStyles.searchIcon}
+              />
+              <BottomSheetTextInput
+                style={[contentStyles.searchInput, { color: textColor }]}
+                placeholder="Search..."
+                placeholderTextColor={foregroundMuted}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {searchQuery?.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery("")}>
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={foregroundMuted}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </ThemedView>
+
+        <View style={contentStyles.listContainer}>
+          <BottomSheetFlatList
+            data={filteredOptions}
+            keyboardShouldPersistTaps="always"
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  onValueChange(item);
+                  hideBottomSheet();
+                }}
+              >
+                <View style={contentStyles.option}>
+                  <View style={contentStyles.optionContent}>
+                    {iconRenderer?.(item)}
+
+                    <View style={{ flexDirection: "column" }}>
+                      <ThemedText font="medium">
+                        {labelSelector?.(item)}
+                      </ThemedText>
+                      {descriptionSelector && (
+                        <ThemedText style={[{ color: foregroundMuted }]}>
+                          {descriptionSelector?.(item)}
+                        </ThemedText>
+                      )}
+                    </View>
+                  </View>
+                  {isSelected(item) && (
+                    <Ionicons name="checkmark" size={24} color={textColor} />
+                  )}
+                </View>
+              </TouchableOpacity>
+            )}
+            keyExtractor={keySelector}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+            contentContainerStyle={{
+              paddingBottom: insets.bottom,
+              backgroundColor: backgroundColor,
+            }}
+          />
+        </View>
+      </View>
+    );
+  }
+);
+
+const outerStyles = StyleSheet.create({
   container: {
     gap: 4,
   },
@@ -197,6 +263,46 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     marginLeft: 4,
   },
+  chevron: {
+    marginLeft: 8,
+  },
+});
+
+const contentStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  headerContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    // backgroundColor: backgroundColor,
+    borderBottomWidth: 1,
+    //borderBottomColor: borderColor,
+  },
+  headerTitle: {
+    marginBottom: 12,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    //backgroundColor: secondaryColor,
+    borderRadius: 24,
+    paddingHorizontal: 10,
+    height: 40,
+    marginBottom: 8,
+    borderWidth: 1,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+  },
+  listContainer: {
+    flex: 1,
+  },
   option: {
     flexDirection: "row",
     alignItems: "center",
@@ -208,8 +314,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-  },
-  chevron: {
-    marginLeft: 8,
   },
 });

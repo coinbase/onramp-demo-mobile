@@ -4,11 +4,12 @@ import { Card } from "@/components/Card/Card";
 import { Dropdown } from "@/components/Dropdown/Dropdown";
 import { Fund } from "@/components/Fund/Fund";
 import { AmountInput } from "@/components/FundForm/components/AmountInput";
-import { NetworkDropdown } from "@/components/NetworkDropdown/NetworkDropdown";
 import { ThemedText } from "@/components/ThemedText";
 import { PAYMENT_METHOD_OPTIONS } from "@/constants/constants";
 import {
+  OnrampNetwork,
   OnrampPaymentCurrency,
+  OnrampPaymentMethod,
   OnrampPurchaseCurrency,
 } from "@/constants/types";
 import { useApp } from "@/context/AppContext";
@@ -17,8 +18,8 @@ import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
 import { getCurrencyIcon } from "@/utils/getCurrencyIcon";
 import { getCurrencySymbol } from "@/utils/getCurrencySymbol";
 import { getPaymentMethodIcon } from "@/utils/getPaymentMethodIcon";
-import { memo, useCallback, useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import { memo, useCallback } from "react";
+import { Image, StyleSheet, View } from "react-native";
 import { useAmountInput } from "./hooks/useAmountInput";
 
 type FundFormProps = {
@@ -51,6 +52,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
   } = useApp();
 
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
+  const textColor = useThemeColor({}, "text");
 
   const { handleFiatChange, handleCryptoChange } = useAmountInput({
     setFiatAmount,
@@ -69,12 +71,11 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
         subdivision,
       });
 
-      handleFiatChange(fiatAmount, exchangeRate);
-
-      // Check if the asset is supported on the current network. If not, set the network to the first network that supports the asset
-      if (!asset.networks.some((n) => n.name === network?.name)) {
-        setNetwork(asset.networks[0]);
+      if (Number(fiatAmount) > 0) {
+        handleFiatChange(fiatAmount, exchangeRate);
       }
+
+      setNetwork(asset.networks[0]);
 
       setExchangeRate(exchangeRate);
 
@@ -96,7 +97,9 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
         subdivision,
       });
 
-      handleCryptoChange(cryptoAmount, exchangeRate);
+      if (Number(cryptoAmount) > 0) {
+        handleCryptoChange(cryptoAmount, exchangeRate);
+      }
 
       setExchangeRate(exchangeRate);
 
@@ -105,18 +108,168 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
     [currency, country, subdivision, cryptoAmount, asset]
   );
 
-  const assetList = useMemo(() => {
-    return purchaseCurrencies
-      .filter((currency) =>
-        currency.networks.some((n) => n.name === network?.name)
-      )
-      .map((currency) => ({
-        id: currency.id,
-        label: currency.symbol,
-        value: currency,
-        iconUrl: currency.iconUrl,
-      }));
-  }, [purchaseCurrencies, network]);
+  const isCurrencySelected = useCallback(
+    (option: OnrampPaymentCurrency) => {
+      return option.id === currency?.id;
+    },
+    [currency]
+  );
+
+  const keySelector = useCallback(
+    (option: OnrampPaymentCurrency) => option.id,
+    []
+  );
+
+  const currencyLabelSelector = useCallback(
+    (option: OnrampPaymentCurrency) => option.id,
+    []
+  );
+
+  const currencyIconRenderer = useCallback(
+    (option: OnrampPaymentCurrency, width = 32, height = 32) => {
+      return (
+        <Image
+          source={{ uri: getCurrencyIcon(option.id, width) }}
+          style={{ width, height, marginRight: 8 }}
+          resizeMode="contain"
+        />
+      );
+    },
+    []
+  );
+
+  const currencySearchFunction = useCallback(
+    (query: string, options: OnrampPaymentCurrency[]) => {
+      return options.filter((option) =>
+        option.id.toLowerCase().includes(query.toLowerCase())
+      );
+    },
+    []
+  );
+
+  const assetLabelSelector = useCallback(
+    (option: OnrampPurchaseCurrency) => option.symbol,
+    []
+  );
+
+  const assetDescriptionSelector = useCallback(
+    (option: OnrampPurchaseCurrency) => option.name,
+    []
+  );
+
+  const assetIconRenderer = useCallback(
+    (option: OnrampPurchaseCurrency, width = 32, height = 32) => {
+      return (
+        <Image
+          source={{ uri: option.iconUrl }}
+          style={{ width, height, marginRight: 8 }}
+          resizeMode="contain"
+        />
+      );
+    },
+    []
+  );
+
+  const assetSearchFunction = useCallback(
+    (query: string, options: OnrampPurchaseCurrency[]) => {
+      return options.filter(
+        (option) =>
+          option.name.toLowerCase().includes(query.toLowerCase()) ||
+          option.symbol.toLowerCase().includes(query.toLowerCase())
+      );
+    },
+    []
+  );
+
+  const isAssetSelected = useCallback(
+    (option: OnrampPurchaseCurrency) => {
+      return option.id === asset?.id;
+    },
+    [asset]
+  );
+
+  const isNetworkSelected = useCallback(
+    (option: OnrampNetwork) => {
+      return option.name === network?.name;
+    },
+    [network]
+  );
+
+  const networkSearchFunction = useCallback(
+    (query: string, options: OnrampNetwork[]) => {
+      return options.filter(
+        (option) =>
+          option.displayName.toLowerCase().includes(query.toLowerCase()) ||
+          option.name.toLowerCase().includes(query.toLowerCase())
+      );
+    },
+    []
+  );
+
+  const networkKeySelector = useCallback(
+    (option: OnrampNetwork) => option.name,
+    []
+  );
+
+  const networkLabelSelector = useCallback(
+    (option: OnrampNetwork) => option.displayName,
+    []
+  );
+
+  const networkIconRenderer = useCallback(
+    (option: OnrampNetwork, width = 32, height = 32) => {
+      if (!option) {
+        return null;
+      }
+      return (
+        <Image
+          source={{ uri: option.iconUrl }}
+          style={{ width, height, marginRight: 8 }}
+          resizeMode="contain"
+        />
+      );
+    },
+    []
+  );
+
+  const isPaymentMethodSelected = useCallback(
+    (option: OnrampPaymentMethod) => {
+      return option.id === paymentMethod?.id;
+    },
+    [paymentMethod]
+  );
+
+  const paymentMethodKeySelector = useCallback(
+    (option: OnrampPaymentMethod) => option.id,
+    []
+  );
+
+  const paymentMethodLabelSelector = useCallback(
+    (option: OnrampPaymentMethod) => option.displayName,
+    []
+  );
+
+  const paymentMethodIconRenderer = useCallback(
+    (option: OnrampPaymentMethod, width = 32, height = 32) => {
+      if (!option) {
+        return null;
+      }
+      const Icon = getPaymentMethodIcon(option.id);
+      if (!Icon) {
+        return null;
+      }
+
+      return (
+        <Icon
+          width={width}
+          height={height}
+          style={{ marginRight: 8 }}
+          color={textColor}
+        />
+      );
+    },
+    []
+  );
 
   return (
     <View style={styles.container}>
@@ -131,17 +284,16 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
             isLoading={dataLoading}
           />
 
-          <Dropdown<any>
+          <Dropdown
             title="Select currency"
             value={currency}
             onValueChange={handleChangeCurrency}
-            isSelected={(option) => option.id === currency?.id}
-            options={paymentCurrencies.map((currency) => ({
-              id: currency.id,
-              label: currency.id,
-              value: currency,
-              iconUrl: getCurrencyIcon(currency.id, 32),
-            }))}
+            isSelected={isCurrencySelected}
+            keySelector={keySelector}
+            labelSelector={currencyLabelSelector}
+            iconRenderer={currencyIconRenderer}
+            options={paymentCurrencies}
+            searchFunction={currencySearchFunction}
           />
         </RowSpaceBetween>
 
@@ -156,12 +308,17 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
             isLoading={dataLoading}
           />
 
-          <Dropdown<any>
+          <Dropdown
             title="Select asset"
             value={asset}
             onValueChange={handleChangeAsset}
-            isSelected={(option) => option.id === asset?.id}
-            options={assetList}
+            isSelected={isAssetSelected}
+            keySelector={keySelector}
+            labelSelector={assetLabelSelector}
+            descriptionSelector={assetDescriptionSelector}
+            iconRenderer={assetIconRenderer}
+            options={purchaseCurrencies}
+            searchFunction={assetSearchFunction}
           />
         </RowSpaceBetween>
 
@@ -170,7 +327,18 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
         <RowSpaceBetween>
           <ThemedText style={{ color: foregroundMuted }}>Network</ThemedText>
 
-          <NetworkDropdown />
+          <Dropdown
+            title="Select network"
+            value={network}
+            onValueChange={setNetwork}
+            isSelected={isNetworkSelected}
+            disabled={asset?.networks.length === 1}
+            options={asset?.networks || []}
+            searchFunction={networkSearchFunction}
+            keySelector={networkKeySelector}
+            labelSelector={networkLabelSelector}
+            iconRenderer={networkIconRenderer}
+          />
         </RowSpaceBetween>
       </Card>
 
@@ -178,17 +346,15 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
         <RowSpaceBetween>
           <ThemedText style={{ color: foregroundMuted }}>Pay with</ThemedText>
 
-          <Dropdown<any>
+          <Dropdown
             title="Pay with"
             value={paymentMethod}
             onValueChange={setPaymentMethod}
-            isSelected={(option) => option.id === paymentMethod?.id}
-            options={PAYMENT_METHOD_OPTIONS.map((option) => ({
-              id: option.id,
-              label: option.displayName,
-              value: option,
-              Icon: getPaymentMethodIcon(option.id),
-            }))}
+            isSelected={isPaymentMethodSelected}
+            labelSelector={paymentMethodLabelSelector}
+            keySelector={paymentMethodKeySelector}
+            iconRenderer={paymentMethodIconRenderer}
+            options={PAYMENT_METHOD_OPTIONS}
           />
         </RowSpaceBetween>
       </Card>

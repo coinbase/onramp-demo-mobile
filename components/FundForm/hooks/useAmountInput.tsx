@@ -20,7 +20,12 @@ export const useAmountInput = ({
       ).toFixed(8);
 
       const resultCryptoValue = truncateDecimalPlaces(calculatedCryptoValue, 8);
-      setCryptoAmount(calculatedCryptoValue === "0" ? "" : resultCryptoValue);
+
+      setCryptoAmount(
+        calculatedCryptoValue === "0" || Number(calculatedCryptoValue) === 0
+          ? ""
+          : resultCryptoValue
+      );
     },
     [setFiatAmount, setCryptoAmount]
   );
@@ -35,6 +40,7 @@ export const useAmountInput = ({
       ).toFixed(2);
 
       const resultFiatValue = truncateDecimalPlaces(calculatedFiatValue, 2);
+
       setFiatAmount(resultFiatValue === "0" ? "" : resultFiatValue);
     },
     [setFiatAmount, setCryptoAmount]

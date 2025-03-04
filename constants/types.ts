@@ -93,6 +93,7 @@ export type OnrampNetwork = {
   displayName: string;
   chainId: string;
   contractAddress: string;
+  iconUrl: string;
 };
 
 export type OnrampPaymentMethodLimit = {

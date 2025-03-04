@@ -12,9 +12,9 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function WalletScreen() {
-  const { user, logout } = usePrivy();
+  const { logout } = usePrivy();
   const insets = useSafeAreaInsets();
-  const { network, setNetwork } = useApp();
+  const { network } = useApp();
   const currentWallet = useWallet({ network: network?.name || "base" });
   const negativeColor = useThemeColor({}, "negative");
   const { setAppLoading, setAppLoadingMessage } = useApp();
@@ -45,7 +45,10 @@ export default function WalletScreen() {
       <View style={styles.content}>
         <Balance network={network?.name || "base"} />
 
-        <WalletDetails address={currentWallet?.address} />
+        <WalletDetails
+          address={currentWallet?.address}
+          network={network?.displayName}
+        />
       </View>
 
       <View style={styles.footer}>

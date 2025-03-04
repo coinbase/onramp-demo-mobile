@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/images/onramp.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0052FF"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -41,7 +41,17 @@
     "owner": "coinbase",
     "plugins": [
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "imageResizeMode": "contain",
+          "image": "./assets/images/onramp.png",
+          "backgroundColor": "#0052FF",
+          "imageWidth": 150,
+          "imageHeight": 150
+        }
+      ]
     ]
   }
 }

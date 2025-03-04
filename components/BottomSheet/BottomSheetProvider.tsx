@@ -12,7 +12,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type BottomSheetContextType = {
   showBottomSheet: (content: React.ReactNode, snapPoints?: string[]) => void;
@@ -39,6 +40,7 @@ export const BottomSheetProvider = memo(
     const [points, setPoints] = useState<string[]>(["50%"]);
     const [isReady, setIsReady] = useState(false);
 
+    const insets = useSafeAreaInsets();
     useEffect(() => {
       // Ensure the component is mounted
       setIsReady(true);
@@ -83,6 +85,9 @@ export const BottomSheetProvider = memo(
         {children}
         {isReady && (
           <BottomSheet
+            maxDynamicContentSize={
+              Dimensions.get("screen").height - insets.top - 50
+            }
             ref={bottomSheetRef}
             index={-1}
             snapPoints={points}
@@ -99,6 +104,9 @@ export const BottomSheetProvider = memo(
               if (index === -1) setContent(null);
             }}
             backgroundStyle={{ backgroundColor }}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="none"
+            android_keyboardInputMode="adjustResize"
           >
             <View style={styles.contentContainer}>{content}</View>
           </BottomSheet>

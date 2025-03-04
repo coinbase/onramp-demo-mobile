@@ -1,10 +1,8 @@
 import { FundForm } from "@/components/FundForm/FundForm";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { CURRENCY_OPTIONS } from "@/constants/constants";
 import { useApp } from "@/context/AppContext";
 import { useWallet } from "@/hooks/useWallet";
-import { useMemo } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,16 +12,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
-  const { currency, network } = useApp();
+  const { network } = useApp();
 
   const insets = useSafeAreaInsets();
   const currentWallet = useWallet({ network: network?.name || "base" });
-
-  const currencySymbol = useMemo(
-    () =>
-      CURRENCY_OPTIONS.find((option) => option.value === currency?.id)?.symbol,
-    [currency]
-  );
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -31,7 +23,7 @@ export default function HomeScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1, paddingTop: insets.top }}
       >
-        <ThemedText type="subtitle" style={{ textAlign: "center" }}>
+        <ThemedText type="subtitle" style={{ textAlign: "center", height: 56 }}>
           Coinbase Onramp demo
         </ThemedText>
         <ScrollView

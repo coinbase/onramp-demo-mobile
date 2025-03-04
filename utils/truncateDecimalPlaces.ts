@@ -3,10 +3,10 @@
  */
 export const truncateDecimalPlaces = (
   value: string | number,
-  decimalPlaces: number,
+  decimalPlaces: number
 ) => {
   const stringValue = String(value);
-  const decimalIndex = stringValue.indexOf('.');
+  const decimalIndex = stringValue.indexOf(".");
   let resultValue = stringValue;
 
   if (

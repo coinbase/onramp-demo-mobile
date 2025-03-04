@@ -1,7 +1,7 @@
 import { CDP_PROJECT_ID } from "@/constants/constants";
 import { getOnrampBuyUrl } from "@/utils/getOnrampUrl";
 import * as WebBrowser from "expo-web-browser";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import Button from "../Button/Button";
 
@@ -21,7 +21,7 @@ export const Fund = memo(
     walletAddress,
     walletChain = "base",
   }: FundProps) => {
-    const handlePressFund = async () => {
+    const handlePressFund = useCallback(async () => {
       try {
         /**
          * This is the main integration point for the Coinbase Onramp
@@ -47,7 +47,7 @@ export const Fund = memo(
       } catch (error) {
         console.error(error);
       }
-    };
+    }, [amount, asset, currency, walletAddress, walletChain]);
 
     return (
       <View style={styles.container}>
