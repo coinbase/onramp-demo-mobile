@@ -212,7 +212,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
   );
 
   const networkLabelSelector = useCallback(
-    (option: OnrampNetwork) => option.displayName,
+    (option: OnrampNetwork) => option?.displayName,
     []
   );
 
@@ -294,6 +294,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
             iconRenderer={currencyIconRenderer}
             options={paymentCurrencies}
             searchFunction={currencySearchFunction}
+            snapPoints={["85%"]}
           />
         </RowSpaceBetween>
 
@@ -319,6 +320,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
             iconRenderer={assetIconRenderer}
             options={purchaseCurrencies}
             searchFunction={assetSearchFunction}
+            snapPoints={["85%"]}
           />
         </RowSpaceBetween>
 
@@ -338,6 +340,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
             keySelector={networkKeySelector}
             labelSelector={networkLabelSelector}
             iconRenderer={networkIconRenderer}
+            snapPoints={["85%"]}
           />
         </RowSpaceBetween>
       </Card>
@@ -355,6 +358,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
             keySelector={paymentMethodKeySelector}
             iconRenderer={paymentMethodIconRenderer}
             options={PAYMENT_METHOD_OPTIONS}
+            snapPoints={["50%"]}
           />
         </RowSpaceBetween>
       </Card>

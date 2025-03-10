@@ -16,7 +16,11 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type BottomSheetContextType = {
-  showBottomSheet: (content: React.ReactNode, snapPoints?: string[]) => void;
+  showBottomSheet: (
+    content: React.ReactNode,
+    snapPoints?: string[],
+    enableDynamicSizing?: boolean
+  ) => void;
   hideBottomSheet: () => void;
 };
 
@@ -37,8 +41,9 @@ export const BottomSheetProvider = memo(
 
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [content, setContent] = useState<React.ReactNode>(null);
-    const [points, setPoints] = useState<string[]>(["50%"]);
+    const [points, setPoints] = useState<string[]>(["85%"]);
     const [isReady, setIsReady] = useState(false);
+    const [enableDynamicSizing, setEnableDynamicSizing] = useState(false);
 
     const insets = useSafeAreaInsets();
     useEffect(() => {
@@ -63,13 +68,22 @@ export const BottomSheetProvider = memo(
     );
 
     const showBottomSheet = useCallback(
-      (newContent: React.ReactNode, snapPoints?: string[]) => {
+      (
+        newContent: React.ReactNode,
+        snapPoints?: string[],
+        enableDynamicSizing?: boolean
+      ) => {
         if (!isReady) return;
 
-        if (snapPoints) {
-          setPoints(snapPoints);
-        }
-        bottomSheetRef.current?.expand();
+        setPoints(snapPoints || ["85%"]);
+        setEnableDynamicSizing(enableDynamicSizing || false);
+
+        requestAnimationFrame(() => {
+          // setPoints is not updated immediately, so we need to wait for the next frame
+          setTimeout(() => {
+            bottomSheetRef.current?.expand();
+          }, 1);
+        });
         setContent(newContent);
       },
       [isReady]
@@ -88,6 +102,7 @@ export const BottomSheetProvider = memo(
             maxDynamicContentSize={
               Dimensions.get("screen").height - insets.top - 50
             }
+            enableDynamicSizing={enableDynamicSizing}
             ref={bottomSheetRef}
             index={-1}
             snapPoints={points}

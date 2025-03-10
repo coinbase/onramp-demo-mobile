@@ -48,8 +48,8 @@
           "imageResizeMode": "contain",
           "image": "./assets/images/onramp.png",
           "backgroundColor": "#0052FF",
-          "imageWidth": 150,
-          "imageHeight": 150
+          "imageWidth": 100,
+          "imageHeight": 100
         }
       ]
     ]

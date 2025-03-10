@@ -1,34 +1,20 @@
 import { ThemedText } from "@/components/ThemedText";
 import { OnrampNetwork } from "@/constants/types";
-import { useApp } from "@/context/AppContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import React, { memo, useCallback, useState } from "react";
-import {
-  Animated,
-  Clipboard,
-  Image,
-  Pressable,
-  StyleSheet,
-  View,
-} from "react-native";
+import React, { memo, useState } from "react";
+import { Animated, Clipboard, Pressable, StyleSheet, View } from "react-native";
 import { RowSpaceBetween } from "../blocks/RowSpaceBetween";
-import { Dropdown } from "../Dropdown/Dropdown";
 
 type WalletDetailsProps = {
   address?: string;
-  network?: string;
+  network?: OnrampNetwork;
 };
 
 export const WalletDetails = memo(
   ({ address, network }: WalletDetailsProps) => {
-    const { allNetworks } = useApp();
-
     const [showCopied, setShowCopied] = useState(false);
     const fadeAnim = useState(new Animated.Value(0))[0];
     const foregroundMuted = useThemeColor({}, "foregroundMuted");
-
-    const [selectedNetwork, setSelectedNetwork] =
-      useState<OnrampNetwork | null>(allNetworks[0]);
 
     const handleCopyAddress = async () => {
       if (address) {
@@ -50,68 +36,12 @@ export const WalletDetails = memo(
       }
     };
 
-    const iconRenderer = useCallback(
-      (option: OnrampNetwork, width = 32, height = 32) => {
-        if (!option) {
-          return null;
-        }
-        return (
-          <Image
-            source={{ uri: option.iconUrl }}
-            style={{ width, height, marginRight: 8 }}
-            resizeMode="contain"
-          />
-        );
-      },
-      []
-    );
-
-    const searchFunction = useCallback(
-      (query: string, options: OnrampNetwork[]) => {
-        return options.filter(
-          (option) =>
-            option.displayName.toLowerCase().includes(query.toLowerCase()) ||
-            option.name.toLowerCase().includes(query.toLowerCase())
-        );
-      },
-      []
-    );
-
-    const isSelected = useCallback(
-      (option: OnrampNetwork) => {
-        return option.name === selectedNetwork?.name;
-      },
-      [selectedNetwork]
-    );
-
-    const keySelector = useCallback(
-      (option: OnrampNetwork) => option?.name,
-      []
-    );
-
-    const labelSelector = useCallback(
-      (option: OnrampNetwork) => option?.displayName,
-      []
-    );
-
     return (
       <>
         <RowSpaceBetween containerStyle={{ marginBottom: 16 }}>
           <ThemedText font="medium" type="subtitle">
             Wallet details
           </ThemedText>
-          <Dropdown
-            title="Select network"
-            value={selectedNetwork}
-            onValueChange={setSelectedNetwork}
-            isSelected={isSelected}
-            disabled={allNetworks.length === 1}
-            options={allNetworks}
-            searchFunction={searchFunction}
-            keySelector={keySelector}
-            labelSelector={labelSelector}
-            iconRenderer={iconRenderer}
-          />
         </RowSpaceBetween>
 
         <View style={styles.walletAddressContainer}>
@@ -119,7 +49,7 @@ export const WalletDetails = memo(
             font="regular"
             style={{ color: foregroundMuted, paddingBottom: 8 }}
           >
-            {`${network} wallet address`}
+            {`${network?.displayName} wallet address`}
           </ThemedText>
           <Pressable onPress={handleCopyAddress}>
             <ThemedText numberOfLines={3}>

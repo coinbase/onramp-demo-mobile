@@ -29,6 +29,8 @@ type DropdownProps = {
     height?: number
   ) => React.ReactNode;
   keySelector?: (option: any) => string;
+  enableDynamicSizing?: boolean;
+  snapPoints?: string[];
 };
 
 export const Dropdown = memo(
@@ -46,6 +48,8 @@ export const Dropdown = memo(
     descriptionSelector,
     iconRenderer,
     keySelector,
+    enableDynamicSizing = false,
+    snapPoints,
   }: DropdownProps) => {
     const { showBottomSheet, hideBottomSheet } = useBottomSheet();
     const textColor = useThemeColor({}, "text");
@@ -77,16 +81,18 @@ export const Dropdown = memo(
                 labelSelector={labelSelector}
                 descriptionSelector={descriptionSelector}
                 iconRenderer={iconRenderer}
-              />
+              />,
+              snapPoints,
+              enableDynamicSizing
             )
           }
           disabled={disabled}
         >
           <View style={outerStyles.buttonContent}>
-            {iconRenderer?.(selectedOption!, 24, 24)}
+            {iconRenderer?.(selectedOption, 24, 24)}
 
             <ThemedText>
-              {labelSelector?.(selectedOption!) || placeholder}
+              {labelSelector?.(selectedOption) || placeholder}
             </ThemedText>
           </View>
           <Ionicons
@@ -227,7 +233,6 @@ const DropdownContent = memo(
             showsVerticalScrollIndicator={false}
             bounces={false}
             contentContainerStyle={{
-              paddingBottom: insets.bottom,
               backgroundColor: backgroundColor,
             }}
           />
@@ -275,9 +280,6 @@ const contentStyles = StyleSheet.create({
   headerContainer: {
     paddingHorizontal: 24,
     paddingVertical: 12,
-    // backgroundColor: backgroundColor,
-    borderBottomWidth: 1,
-    //borderBottomColor: borderColor,
   },
   headerTitle: {
     marginBottom: 12,
@@ -285,7 +287,6 @@ const contentStyles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    //backgroundColor: secondaryColor,
     borderRadius: 24,
     paddingHorizontal: 10,
     height: 40,

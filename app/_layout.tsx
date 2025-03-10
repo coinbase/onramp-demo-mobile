@@ -25,6 +25,8 @@ import {
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
 
+import { base, polygon, unichain } from "viem/chains";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -59,7 +61,11 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <PrivyProvider appId={PRIVY_APP_ID} clientId={PRIVY_CLIENT_ID}>
+        <PrivyProvider
+          appId={PRIVY_APP_ID}
+          clientId={PRIVY_CLIENT_ID}
+          supportedChains={[base, polygon, unichain]}
+        >
           <PrivyElements />
           <AppProvider>
             <BottomSheetModalProvider>

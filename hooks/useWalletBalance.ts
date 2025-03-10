@@ -2,6 +2,7 @@ import {
   SolanaClient,
   useEmbeddedEthereumWallet,
   useEmbeddedSolanaWallet,
+  usePrivyClient,
 } from "@privy-io/expo";
 import { useCallback, useEffect, useState } from "react";
 
@@ -13,6 +14,7 @@ export const useWalletBalance = ({
   const [balance, setBalance] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error>();
+  const {} = usePrivyClient();
   const { wallets: ethWallets } = useEmbeddedEthereumWallet();
   const { wallets: solWallets } = useEmbeddedSolanaWallet();
 
