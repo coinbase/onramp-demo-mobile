@@ -2,9 +2,10 @@ import OnrampBrandLogo from "@/assets/images/OnrampBrandLogo";
 import OnrampBrandLogoDark from "@/assets/images/OnrampBrandLogoDark";
 import { ThemedText } from "@/components/ThemedText";
 import { useApp } from "@/context/AppContext";
+import { useLogin } from "@/hooks/useLogin";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { OAuthProviderType, useLoginWithOAuth } from "@privy-io/expo";
+import { OAuthProviderType } from "@privy-io/expo";
 import { router } from "expo-router";
 import {
   StyleSheet,
@@ -53,7 +54,8 @@ export default function LoginScreen() {
   const secondary = useThemeColor({}, "secondary");
   const foreground = useThemeColor({}, "foreground");
   const insets = useSafeAreaInsets();
-  const { login } = useLoginWithOAuth();
+  const { login } = useLogin();
+
   const { setAppLoading, setAppLoadingMessage } = useApp();
 
   const handleLogin = async (loginProvider: OAuthProviderType) => {

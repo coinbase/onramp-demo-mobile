@@ -1,10 +1,11 @@
 import { LoadingScreen } from "@/components/LoadingScreen/LoadingScreen";
-import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
 import { useEffect } from "react";
 
+import { useUser } from "@/hooks/useUser";
+
 export default function Index() {
-  const { isReady, user } = usePrivy();
+  const { isReady, user } = useUser();
 
   useEffect(() => {
     if (!isReady) return;

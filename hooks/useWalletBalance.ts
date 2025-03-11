@@ -1,10 +1,7 @@
-import {
-  SolanaClient,
-  useEmbeddedEthereumWallet,
-  useEmbeddedSolanaWallet,
-  usePrivyClient,
-} from "@privy-io/expo";
 import { useCallback, useEffect, useState } from "react";
+import { useEtheriumWallet } from "./useEtheriumWallet";
+import { useSolanaClient } from "./useSolanaClient";
+import { useSolanaWallet } from "./useSolanaWallet";
 
 export const useWalletBalance = ({
   network,
@@ -14,9 +11,10 @@ export const useWalletBalance = ({
   const [balance, setBalance] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error>();
-  const {} = usePrivyClient();
-  const { wallets: ethWallets } = useEmbeddedEthereumWallet();
-  const { wallets: solWallets } = useEmbeddedSolanaWallet();
+
+  const { wallets: ethWallets } = useEtheriumWallet();
+  const { wallets: solWallets } = useSolanaWallet();
+  const solanaClient = useSolanaClient();
 
   const fetchBalance = useCallback(async () => {
     if (network === "ethereum" && ethWallets.length === 0) return;
@@ -28,11 +26,6 @@ export const useWalletBalance = ({
     try {
       if (network === "solana") {
         const wallet = solWallets?.[0];
-
-        const solanaClient = new SolanaClient({
-          name: "mainnet-beta",
-          rpcUrl: "https://api.mainnet-beta.solana.com",
-        });
 
         const balance = await solanaClient.getBalance(wallet?.address || "");
 

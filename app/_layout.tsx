@@ -2,7 +2,6 @@ import { CoinbaseDisplayFonts } from "@/assets/fonts";
 import { AppProvider } from "@/context/AppContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { PrivyElements, PrivyProvider } from "@privy-io/expo";
 import {
   DarkTheme,
   DefaultTheme,
@@ -19,13 +18,13 @@ import "react-native-reanimated";
 import { BottomSheetProvider } from "@/components/BottomSheet/BottomSheetProvider";
 import { LoadingOverlay } from "@/components/LoadingOverlay/LoadingOverlay";
 import { PRIVY_APP_ID, PRIVY_CLIENT_ID } from "@/constants/constants";
+
 import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
-
-import { base, polygon, unichain } from "viem/chains";
+import { PrivyElements, PrivyProvider } from "@privy-io/expo";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -64,7 +63,7 @@ export default function RootLayout() {
         <PrivyProvider
           appId={PRIVY_APP_ID}
           clientId={PRIVY_CLIENT_ID}
-          supportedChains={[base, polygon, unichain]}
+          // supportedChains={[base, polygon, unichain]}
         >
           <PrivyElements />
           <AppProvider>

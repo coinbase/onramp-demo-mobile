@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   const primaryColor = useThemeColor({}, "primary");
@@ -16,7 +17,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
+        tabBarBackground: Platform.OS === "ios" ? undefined : TabBarBackground,
         tabBarStyle: {
           position: "relative",
         },

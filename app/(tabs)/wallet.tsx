@@ -1,20 +1,20 @@
-import { Balance } from "@/components/Balance/Balance";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { WalletDetails } from "@/components/WalletDetails/WalletDetails";
 import { OnrampNetwork } from "@/constants/types";
 import { useApp } from "@/context/AppContext";
+import { useLogout } from "@/hooks/useLogout";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useWallet } from "@/hooks/useWallet";
 import { Ionicons } from "@expo/vector-icons";
-import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { useCallback, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function WalletScreen() {
-  const { logout } = usePrivy();
+  const { logout } = useLogout();
   const insets = useSafeAreaInsets();
   const { allNetworks, network } = useApp();
 
@@ -22,12 +22,7 @@ export default function WalletScreen() {
     network!
   );
 
-  const {
-    currentWallet,
-    sendEthereumTransaction,
-    switchEVMChain,
-    handleExportWallet,
-  } = useWallet({
+  const { currentWallet, switchEVMChain } = useWallet({
     network: selectedNetwork?.name || "base",
   });
 
@@ -56,6 +51,12 @@ export default function WalletScreen() {
     [switchEVMChain]
   );
 
+  const handleExportWallet = useCallback(async () => {
+    await WebBrowser.openBrowserAsync(
+      "https://onramp-demo-application.vercel.app/wallet-export"
+    );
+  }, []);
+
   return (
     <ThemedView
       style={[
@@ -67,19 +68,25 @@ export default function WalletScreen() {
       ]}
     >
       <View style={styles.content}>
-        <Balance
+        {/* <Balance
           network={selectedNetwork}
           onNetworkChange={handleChangeNetwork}
-        />
+        /> */}
 
         <WalletDetails
           address={currentWallet?.address}
           network={selectedNetwork}
+          onNetworkChange={handleChangeNetwork}
         />
 
+        <ThemedText>
+          You can export your wallet by clicking the button below. It will take
+          you to a new page where you will need to sign in with the same account
+          you used to login in this app.
+        </ThemedText>
         <TouchableOpacity onPress={handleExportWallet} style={styles.button}>
           <View style={styles.buttonContent}>
-            <Ionicons name="log-out-outline" size={24} color={negativeColor} />
+            <Ionicons name="wallet-outline" size={24} color={negativeColor} />
             <ThemedText font="medium" style={[{ color: negativeColor }]}>
               Export Wallet
             </ThemedText>

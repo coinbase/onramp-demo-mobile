@@ -1,35 +1,14 @@
-import {
-  useEmbeddedEthereumWallet,
-  useEmbeddedSolanaWallet,
-} from "@privy-io/expo";
-import { useEffect } from "react";
+import { useEtheriumWallet } from "./useEtheriumWallet";
+import { useSolanaWallet } from "./useSolanaWallet";
 
-import { usePrivy, useSolanaWallets } from "@privy-io/react-auth";
 /**
  * Hook to create a wallet if it doesn't exist
  * @param network - The network to create the wallet on
  * @returns The current wallet
  */
 export const useWallet = ({ network }: { network: string }) => {
-  const { wallets: ethWallets, create: createEthWallet } =
-    useEmbeddedEthereumWallet();
-  const { wallets: solWallets, create: createSolWallet } =
-    useEmbeddedSolanaWallet();
-
-  const { exportWallet } = usePrivy();
-
-  const { exportWallet: exportSolanaWallet } = useSolanaWallets();
-  useEffect(() => {
-    if (network === "solana") {
-      if (!solWallets || solWallets.length === 0) {
-        createSolWallet?.();
-      }
-    } else {
-      if (ethWallets.length === 0) {
-        createEthWallet();
-      }
-    }
-  }, [ethWallets, createEthWallet, solWallets, createSolWallet, network]);
+  const { wallets: ethWallets, create: createEthWallet } = useEtheriumWallet();
+  const { wallets: solWallets, create: createSolWallet } = useSolanaWallet();
 
   const sendEthereumTransaction = async (to: string, amount: number) => {
     // Get address
@@ -65,20 +44,11 @@ export const useWallet = ({ network }: { network: string }) => {
     }
   };
 
-  const handleExportWallet = async () => {
-    if (network === "solana") {
-      exportSolanaWallet(solWallets?.[0]);
-    } else {
-      exportWallet(ethWallets[0]);
-    }
-  };
-
   const currentWallet = network === "solana" ? solWallets?.[0] : ethWallets[0];
 
   return {
     currentWallet,
     sendEthereumTransaction,
     switchEVMChain,
-    handleExportWallet,
   };
 };
