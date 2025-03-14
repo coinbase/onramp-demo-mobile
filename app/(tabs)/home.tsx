@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const { network } = useApp();
 
   const insets = useSafeAreaInsets();
-  const currentWallet = useWallet({ network: network?.name || "base" });
+  const wallet = useWallet({ network: network?.name || "base" });
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -30,7 +30,7 @@ export default function HomeScreen() {
           style={styles.scroll}
           contentContainerStyle={[styles.scrollContent]}
         >
-          <FundForm walletAddress={currentWallet?.address || ""} />
+          <FundForm walletAddress={wallet?.currentWallet?.address || ""} />
         </ScrollView>
       </KeyboardAvoidingView>
     </ThemedView>
