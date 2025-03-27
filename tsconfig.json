@@ -6,9 +6,9 @@
       "@/*": [
         "./*"
       ],
-      "@coinbase/onchainkit/fund": [
-        "./node_modules/@coinbase/onchainkit/src/fund"
-      ]
+      // "@coinbase/onchainkit/fund": [
+      //   "./node_modules/@coinbase/onchainkit/src/fund"
+      // ]
     }
   },
   "include": [

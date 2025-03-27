@@ -1,8 +1,10 @@
+import { CDP_CLIENT_API_KEY } from "@/constants/constants";
 import {
   OnrampPaymentCurrency,
   OnrampPurchaseCurrency,
 } from "@/constants/types";
-import { fetchOnrampQuote } from "./fetchOnrampQuote";
+
+import { fetchOnrampQuote } from "@coinbase/onchainkit/esm/fund/utils/fetchOnrampQuote";
 
 export const fetchExchangeRate = async ({
   asset,
@@ -17,6 +19,7 @@ export const fetchExchangeRate = async ({
 }) => {
   try {
     const quote = await fetchOnrampQuote({
+      apiKey: CDP_CLIENT_API_KEY,
       purchaseCurrency: asset.id,
       paymentCurrency: currency.id,
       paymentAmount:

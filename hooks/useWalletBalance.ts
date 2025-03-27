@@ -39,6 +39,7 @@ export const useWalletBalance = ({
           method: "eth_getBalance",
           params: [wallet.address, "latest"],
         });
+
         const balanceInEth = parseInt(balanceInWei || "0", 16) / 1e18;
         setBalance(balanceInEth.toFixed(8) + " ETH");
       }

@@ -1,4 +1,7 @@
-import { PAYMENT_METHOD_OPTIONS } from "@/constants/constants";
+import {
+  CDP_CLIENT_API_KEY,
+  PAYMENT_METHOD_OPTIONS,
+} from "@/constants/constants";
 import {
   OnrampNetwork,
   OnrampPaymentCurrency,
@@ -6,7 +9,7 @@ import {
   OnrampPurchaseCurrency,
 } from "@/constants/types";
 import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
-import { fetchOnrampOptions } from "@/utils/fetchOnrampOptions";
+import { fetchOnrampOptions } from "@coinbase/onchainkit/esm/fund/utils/fetchOnrampOptions";
 import {
   createContext,
   useCallback,
@@ -83,6 +86,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const handleFetchAllData = useCallback(async () => {
     setAppLoading(true);
     const options = await fetchOnrampOptions({
+      apiKey: CDP_CLIENT_API_KEY,
       country,
       subdivision,
     });

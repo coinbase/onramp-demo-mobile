@@ -1,5 +1,5 @@
 import { CDP_PROJECT_ID } from "@/constants/constants";
-import { getOnrampBuyUrl } from "@/utils/getOnrampUrl";
+import { getOnrampBuyUrl } from "@coinbase/onchainkit/esm/fund/utils/getOnrampBuyUrl";
 import * as WebBrowser from "expo-web-browser";
 import React, { memo, useCallback } from "react";
 import { StyleSheet, View } from "react-native";

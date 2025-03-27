@@ -16,7 +16,7 @@ export const PRIVY_CLIENT_ID =
 
 export const CDP_PROJECT_ID = "6eceb045-266a-4940-9d22-35952496ff00";
 
-export const CDP_CLIENT_ID = "VmvIBxCiyNgDQ78njUIAql86kEokLMQ1";
+export const CDP_CLIENT_API_KEY = "VmvIBxCiyNgDQ78njUIAql86kEokLMQ1";
 
 export const CURRENCY_OPTIONS = [
   {

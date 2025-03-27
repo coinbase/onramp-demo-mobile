@@ -1,9 +1,10 @@
+import { CDP_CLIENT_API_KEY } from "@/constants/constants";
 import type {
   OnrampError,
   OnrampPaymentCurrency,
   OnrampPurchaseCurrency,
 } from "@/constants/types";
-import { fetchOnrampQuote } from "@/utils/fetchOnrampQuote";
+import { fetchOnrampQuote } from "@coinbase/onchainkit/esm/fund/utils/fetchOnrampQuote";
 import { useCallback, useMemo } from "react";
 
 export const useOnrampExchangeRate = ({
@@ -31,6 +32,7 @@ export const useOnrampExchangeRate = ({
     try {
       setExchangeRateLoading(true);
       const quote = await fetchOnrampQuote({
+        apiKey: CDP_CLIENT_API_KEY,
         purchaseCurrency: asset.id,
         paymentCurrency: currency.id,
         paymentAmount:

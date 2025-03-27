@@ -45,5 +45,6 @@ Main integration point is in the [Fund](./components/Fund/Fund.tsx) component.
 
 
 
-
+### Download the iOS app
+You can also download this (iOS) app on your phone using TestFlight [here](https://testflight.apple.com/join/RnGceg3e)
 
