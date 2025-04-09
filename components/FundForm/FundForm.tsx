@@ -369,6 +369,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
         asset={asset?.symbol}
         walletAddress={walletAddress}
         walletChain={network?.name || "base"}
+        paymentMethod={paymentMethod}
       />
     </View>
   );

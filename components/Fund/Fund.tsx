@@ -1,5 +1,7 @@
 import { CDP_PROJECT_ID } from "@/constants/constants";
+import { OnrampPaymentMethod } from "@/constants/types";
 import { getOnrampBuyUrl } from "@coinbase/onchainkit/esm/fund/utils/getOnrampBuyUrl";
+import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import React, { memo, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
@@ -11,6 +13,7 @@ type FundProps = {
   asset?: string;
   walletAddress: string;
   walletChain: string;
+  paymentMethod: OnrampPaymentMethod;
 };
 
 export const Fund = memo(
@@ -20,8 +23,14 @@ export const Fund = memo(
     asset = "ETH",
     walletAddress,
     walletChain = "base",
+    paymentMethod,
   }: FundProps) => {
     const handlePressFund = useCallback(async () => {
+      console.log("paymentMethod", paymentMethod);
+      if (paymentMethod?.id === "APPLE_PAY_GUEST") {
+        return router.push("/zero-click-buy");
+      }
+
       try {
         /**
          * This is the main integration point for the Coinbase Onramp
@@ -47,7 +56,7 @@ export const Fund = memo(
       } catch (error) {
         console.error(error);
       }
-    }, [amount, asset, currency, walletAddress, walletChain]);
+    }, [amount, asset, currency, walletAddress, walletChain, paymentMethod]);
 
     return (
       <View style={styles.container}>

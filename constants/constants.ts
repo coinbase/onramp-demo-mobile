@@ -130,6 +130,11 @@ export const PAYMENT_METHOD_OPTIONS: OnrampPaymentMethod[] = [
     description: "Up to $500/week. No sign up required.",
   },
   {
+    id: "APPLE_PAY_GUEST",
+    displayName: "Apple Pay Guest",
+    description: "Up to $500/week. No sign up required.",
+  },
+  {
     id: "CARD",
     displayName: "Debit card",
     description: "Up to $500/week. No sign up required.",
