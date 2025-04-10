@@ -26,7 +26,6 @@ export const Fund = memo(
     paymentMethod,
   }: FundProps) => {
     const handlePressFund = useCallback(async () => {
-      console.log("paymentMethod", paymentMethod);
       if (paymentMethod?.id === "APPLE_PAY_GUEST") {
         return router.push("/zero-click-buy");
       }
