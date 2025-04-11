@@ -5,8 +5,7 @@ export const DEFAULT_ONRAMP_URL = "https://pay.coinbase.com";
 /** The base URL for the Coinbase Onramp widget */
 export const ONRAMP_BUY_URL = `${DEFAULT_ONRAMP_URL}/buy`;
 
-export const ONRAMP_OCB_GC_AP_URL =
-  "https://localhost:3000/v2/onramp/card-details?addresses=%7B%220x438BbEF3525eF1b0359160FD78AF9c1158485d87%22%3A%5B%22base%22%5D%7D&appId=36b7972f-b87f-4c13-a313-1b00db0212ec&assets=%5B%22ETH%22%5D&fiatCurrency=USD&presetFiatAmount=10";
+export const ONRAMP_OCB_GC_AP_URL = `${DEFAULT_ONRAMP_URL}/v2/api-onramp/apple-pay?addresses=%7B%220x438BbEF3525eF1b0359160FD78AF9c1158485d87%22%3A%5B%22base%22%5D%7D&appId=6eceb045-266a-4940-9d22-35952496ff00&assets=%5B%22ETH%22%5D&fiatCurrency=USD&presetFiatAmount=10`;
 
 export const PRIVY_APP_ID = "cm79e5rbb05qoa6ziniztxby2";
 

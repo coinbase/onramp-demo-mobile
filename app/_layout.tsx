@@ -8,7 +8,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
@@ -69,25 +69,7 @@ export default function RootLayout() {
           <AppProvider>
             <BottomSheetModalProvider>
               <BottomSheetProvider>
-                <Stack>
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="zero-click-buy"
-                    options={{
-                      headerShown: true,
-                      headerBackTitle: "Back",
-                      headerTitle: "Zero Click Buy",
-                    }}
-                  />
-                  <Stack.Screen name="login" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="success"
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
+                <Slot />
                 {loaded && <LoadingOverlay />}
               </BottomSheetProvider>
             </BottomSheetModalProvider>
