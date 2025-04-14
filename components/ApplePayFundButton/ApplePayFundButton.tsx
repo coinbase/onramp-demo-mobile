@@ -1,10 +1,10 @@
-import { LoadingScreen } from "@/components/LoadingScreen/LoadingScreen";
 import { ONRAMP_OCB_GC_AP_URL } from "@/constants/constants";
 import React, { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
+import ApplePayFundButtonLoading from "./ApplePayFundButtonLoading";
 
-const WEBVIEW_HEIGHT = 56;
+export const APPLE_PAY_BUTTON_HEIGHT = 56;
+export const APPLE_PAY_BUTTON_RADIUS = 12;
 
 /**
  * We are injecting a custom style to the webview to make the Apple Pay button look like our button.
@@ -14,9 +14,9 @@ const style = document.createElement('style');
 style.innerHTML = \`.onramp-apple-pay-button {
   background-color: #0052FF !important;
   color: white !important;
-  border-radius: 12px !important;
+  border-radius: ${APPLE_PAY_BUTTON_RADIUS}px !important;
   font-size: 18px !important;
-  height: ${WEBVIEW_HEIGHT}px !important;
+  height: ${APPLE_PAY_BUTTON_HEIGHT}px !important;
 }\`;
 document.head.appendChild(style);
 true;
@@ -28,30 +28,37 @@ export default function ApplePayFundButton() {
 
   return (
     <>
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <LoadingScreen />
-        </View>
-      )}
+      {/* Custom loading indicator that looks like the Apple Pay button from the webview that allows to have seemless transition while loading  */}
+      <ApplePayFundButtonLoading isLoading={isLoading} />
 
       <WebView
         ref={webViewRef}
-        // Webview should be the same height as the button.
-        style={{ height: WEBVIEW_HEIGHT }}
+        style={{
+          height: isLoading ? 0 : APPLE_PAY_BUTTON_HEIGHT,
+          borderRadius: APPLE_PAY_BUTTON_RADIUS,
+        }}
         onLoadEnd={() => {
           /**
            * We are injecting a custom style to the webview to make the Apple Pay button look like our button.
            */
           webViewRef.current?.injectJavaScript(injectedJavaScript);
+        }}
+        onMessage={({ nativeEvent }) => {
+          const { eventName } = JSON.parse(nativeEvent.data);
 
-          /**
-           * In webview we could use renderLoading={() => <LoadingScreen />},
-           * however the loading component is unmounted and then the webview content starts rendering.
-           * This result in a flash (empty screen is rendered between loading unmount and webview content render)
-           *
-           * To avoid this, we are adding a small delay to allow webview content to render before we unmount the loading component.
-           */
-          setTimeout(() => setIsLoading(false), 500);
+          switch (eventName) {
+            case "onramp_api.load_success":
+              setIsLoading(false);
+              break;
+            case "onramp_api.load_pending":
+              break;
+            case "onramp_api.commit_error":
+              break;
+            case "onramp_api.commit_success":
+              break;
+            default:
+              break;
+          }
         }}
         source={{ uri: ONRAMP_OCB_GC_AP_URL }}
         startInLoadingState={true}
@@ -59,13 +66,3 @@ export default function ApplePayFundButton() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    zIndex: 1,
-  },
-});
