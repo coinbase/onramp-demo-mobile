@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Animated, StyleSheet } from "react-native";
-import {
-  APPLE_PAY_BUTTON_HEIGHT,
-  APPLE_PAY_BUTTON_RADIUS,
-} from "./ApplePayFundButton";
+import { APPLE_PAY_BUTTON_HEIGHT, APPLE_PAY_BUTTON_RADIUS } from "./constants";
 
 const ApplePayFundButtonLoading = ({ isLoading }: { isLoading: boolean }) => {
   const [isRendered, setIsRendered] = useState(true);
