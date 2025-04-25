@@ -21,6 +21,13 @@ import { getPaymentMethodIcon } from "@/utils/getPaymentMethodIcon";
 import { memo, useCallback } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { useAmountInput } from "./hooks/useAmountInput";
+import { router } from "expo-router";
+import { useApiClient } from "@/services/apiClient";
+
+import {
+
+  CreateOrderResponse,
+} from "@/components/ApplePayFundButton/types";
 
 type FundFormProps = {
   walletAddress: string;
@@ -53,6 +60,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
 
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
   const textColor = useThemeColor({}, "text");
+  const apiClient = useApiClient();
 
   const { handleFiatChange, handleCryptoChange } = useAmountInput({
     setFiatAmount,
@@ -107,6 +115,20 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
     },
     [currency, country, subdivision, cryptoAmount, asset]
   );
+
+  const handlePaymentSelection = useCallback(async (paymentMethod: OnrampPaymentMethod) => {
+    setPaymentMethod(paymentMethod);
+    if (paymentMethod.id === "APPLE_PAY_GUEST") {
+      // const response = await apiClient.request<CreateOrderResponse>(
+      //   "/onramp/create-order",
+      //   {
+      //     method: "POST",
+      //   }
+      // );
+      // console.log("response", response);
+      router.push("/two-factor");
+    }
+  }, []);
 
   const isCurrencySelected = useCallback(
     (option: OnrampPaymentCurrency) => {
@@ -352,7 +374,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
           <Dropdown
             title="Pay with"
             value={paymentMethod}
-            onValueChange={setPaymentMethod}
+            onValueChange={handlePaymentSelection}
             isSelected={isPaymentMethodSelected}
             labelSelector={paymentMethodLabelSelector}
             keySelector={paymentMethodKeySelector}

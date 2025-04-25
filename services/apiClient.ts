@@ -1,4 +1,5 @@
 import { usePrivy } from "@privy-io/expo";
+import { createToken }  from '../utils/jwtTokenGeneration';
 
 const BASE_URL = "http://localhost:3000";
 // "https://onramp-demo-server-c1zd230h2-rustam-cbs-projects.vercel.app";
@@ -6,9 +7,12 @@ const BASE_URL = "http://localhost:3000";
 export function useApiClient() {
   const { getAccessToken } = usePrivy();
 
+
   const getAuthHeaders = async (): Promise<Record<string, string>> => {
     try {
       const token = await getAccessToken();
+      const jwtToken = await createToken("GET", "/onramp/create-order");
+      console.log("JWT Token", jwtToken);
       if (!token) {
         throw new Error("No access token available");
       }

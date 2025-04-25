@@ -1,4 +1,5 @@
 import * as Crypto from "expo-crypto";
+import * as jwt from 'jsonwebtoken';
 
 const keyName = "MobileDemoApp";
 const keySecret = `6nLZvCOKACEmI3DgbTQojmCbNHt0KJcQEyPcNSvgriBpp+SFX5DKDyZ5cKb5s/KkUE1dZV08TFZuqdtQ2W6rhQ==`;

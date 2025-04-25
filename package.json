@@ -48,6 +48,7 @@
     "expo-web-browser": "~14.0.2",
     "fast-text-encoding": "^1.0.6",
     "hermes-engine": "^0.11.0",
+    "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "moti": "^0.30.0",
     "react": "18.3.1",
