@@ -27,7 +27,7 @@ export default function TwoFactorScreen() {
   }, [setPaymentMethod]);
 
   return (
-    <ThemedView style={{ flex: 1 }}>
+    <ThemedView style={{ flex: 1, paddingTop: insets.top }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1, paddingTop: insets.top }}
@@ -37,7 +37,7 @@ export default function TwoFactorScreen() {
         </ThemedText>
         <ScrollView
           style={styles.scroll}
-          contentContainerStyle={[styles.scrollContent]}
+          contentContainerStyle={{padding: 32, alignContent: "center"}}
         >
           <TwoFactorForm onCodeSubmit={handleOnCodeSubmit} />
         </ScrollView>
@@ -49,6 +49,7 @@ export default function TwoFactorScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flex: 1,
+    height: "100%",
   },
   scrollContent: {
     gap: 24,
