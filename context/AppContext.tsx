@@ -45,6 +45,8 @@ type AppContextType = {
   paymentCurrencies: OnrampPaymentCurrency[];
   purchaseCurrencies: OnrampPurchaseCurrency[];
   allNetworks: OnrampNetwork[];
+  orderId: string | null;
+  setOrderId: (orderId: string | null) => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -67,6 +69,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const [appLoading, setAppLoading] = useState(false);
   const [appLoadingMessage, setAppLoadingMessage] = useState("Loading...");
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   const [paymentCurrencies, setPaymentCurrencies] = useState<
     OnrampPaymentCurrency[]
@@ -153,6 +156,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     paymentCurrencies,
     purchaseCurrencies,
     allNetworks,
+    orderId,
+    setOrderId,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -56,6 +56,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
     dataLoading,
     setAppLoading,
     allNetworks,
+    setOrderId
   } = useApp();
 
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
@@ -119,14 +120,26 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
   const handlePaymentSelection = useCallback(async (paymentMethod: OnrampPaymentMethod) => {
     setPaymentMethod(paymentMethod);
     if (paymentMethod.id === "APPLE_PAY_GUEST") {
-      const response = await apiClient.request<CreateOrderResponse>(
+      const { order } = await apiClient.request<CreateOrderResponse>(
         "/onramp/order",
         {
           method: "POST",
         }
       );
-      console.log("response", response);
-      router.push("/two-factor");
+      if (order) {
+        setOrderId(order.orderId);
+        const response = await apiClient.request<CreateOrderResponse>(
+          `/onramp/authorize-order/${order.orderId}`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              "type": "sms_otp"
+            })
+          }
+        );
+        if ()
+        router.push("/two-factor");
+      }
     }
   }, []);
 
