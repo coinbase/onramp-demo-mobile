@@ -119,13 +119,13 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
   const handlePaymentSelection = useCallback(async (paymentMethod: OnrampPaymentMethod) => {
     setPaymentMethod(paymentMethod);
     if (paymentMethod.id === "APPLE_PAY_GUEST") {
-      // const response = await apiClient.request<CreateOrderResponse>(
-      //   "/onramp/create-order",
-      //   {
-      //     method: "POST",
-      //   }
-      // );
-      // console.log("response", response);
+      const response = await apiClient.request<CreateOrderResponse>(
+        "/onramp/order",
+        {
+          method: "POST",
+        }
+      );
+      console.log("response", response);
       router.push("/two-factor");
     }
   }, []);

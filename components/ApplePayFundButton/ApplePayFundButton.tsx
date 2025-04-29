@@ -39,31 +39,6 @@ export default function ApplePayFundButton() {
   const [isLoading, setIsLoading] = useState(true);
   const [applePayUrl, setApplePayUrl] = useState("1");
 
-  useEffect(() => {
-    createOrder();
-  }, []);
-
-  const createOrder = async () => {
-    try {
-      const response = await apiClient.request<CreateOrderResponse>(
-        "/onramp/create-order",
-        {
-          method: "POST",
-        }
-      );
-
-      if (response.authSteps.length > 0) {
-        setApplePayUrl(response.authSteps[0].authUrl);
-      }
-
-      if (response.paymentLink) {
-        setApplePayUrl(response.paymentLink.url);
-      }
-    } catch (error) {
-      console.error("Error creating order:", error);
-    }
-  };
-
   const authorizeOrder = async (
     orderId: string,
     authType: AuthType,
