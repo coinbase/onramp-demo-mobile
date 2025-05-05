@@ -120,13 +120,14 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
 
   const handlePaymentSelection = useCallback(async (paymentMethod: OnrampPaymentMethod) => {
     setPaymentMethod(paymentMethod);
+    console.log('fiatAmount', fiatAmount);
     if (paymentMethod.id === "APPLE_PAY_GUEST") {
       const createOrderResponse = await apiClient.request<CreateOrderResponse>(
         "/onramp/order",
         {
           method: "POST",
           body: JSON.stringify({
-            "paymentAmount": "5.00",
+            "paymentAmount": fiatAmount,
             "paymentCurrency": "USD",
             "purchaseCurrency": "USDC",
             "paymentMethod": "GUEST_CHECKOUT_APPLE_PAY",
@@ -155,7 +156,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
         router.push("/two-factor");
       }
     }
-  }, []);
+  }, [fiatAmount, paymentMethod]);
 
   const isCurrencySelected = useCallback(
     (option: OnrampPaymentCurrency) => {

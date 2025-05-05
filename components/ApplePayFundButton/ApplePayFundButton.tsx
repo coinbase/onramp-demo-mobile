@@ -32,19 +32,14 @@ true;
 export default function ApplePayFundButton() {
   const webViewRef = useRef<WebView>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [applePayUrl, setApplePayUrl] = useState("1");
   const { paymentLink } = useApp();
-
-  if (!paymentLink) {
-    return null;
-  }
-
+  
   return (
     <>
       {/* Custom loading indicator that looks like the Apple Pay button from the webview that allows to have seemless transition while loading  */}
       <ApplePayFundButtonLoading isLoading={isLoading} />
 
-      {applePayUrl && (
+      {paymentLink && (
         <WebView
           ref={webViewRef}
           style={{
