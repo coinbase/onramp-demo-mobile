@@ -47,6 +47,8 @@ type AppContextType = {
   allNetworks: OnrampNetwork[];
   orderId: string | null;
   setOrderId: (orderId: string | null) => void;
+  paymentLink: string | null;
+  setPaymentLink: (paymentLink: string | null) => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -66,7 +68,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [country, setCountry] = useState("US");
   const [subdivision, setSubdivision] = useState("CA");
   const [dataLoading, setDataLoading] = useState(false);
-
+  const [paymentLink, setPaymentLink] = useState<string | null>(null);
   const [appLoading, setAppLoading] = useState(false);
   const [appLoadingMessage, setAppLoadingMessage] = useState("Loading...");
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -138,6 +140,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     exchangeRate,
     dataLoading,
     country,
+    paymentLink,
     subdivision,
     setCurrency,
     setAsset,
@@ -147,6 +150,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setPaymentMethod,
     setExchangeRate,
     setCountry,
+    setPaymentLink,
     setSubdivision,
     setDataLoading,
     appLoading,

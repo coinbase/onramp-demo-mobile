@@ -56,7 +56,8 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
     dataLoading,
     setAppLoading,
     allNetworks,
-    setOrderId
+    setOrderId,
+    setPaymentLink,
   } = useApp();
 
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
@@ -120,24 +121,37 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
   const handlePaymentSelection = useCallback(async (paymentMethod: OnrampPaymentMethod) => {
     setPaymentMethod(paymentMethod);
     if (paymentMethod.id === "APPLE_PAY_GUEST") {
-      const { order } = await apiClient.request<CreateOrderResponse>(
+      const createOrderResponse = await apiClient.request<CreateOrderResponse>(
         "/onramp/order",
         {
           method: "POST",
+          body: JSON.stringify({
+            "paymentAmount": "5.00",
+            "paymentCurrency": "USD",
+            "purchaseCurrency": "USDC",
+            "paymentMethod": "GUEST_CHECKOUT_APPLE_PAY",
+            "destinationAddress": "0x55965974232d30f5200dcc39715dbbb7826b5591",
+            "destinationNetwork": "base",
+            "isQuote": true,
+            "email": "patrick.truong@coinbase.com",
+            "phoneNumber": "(+1)555-555-5555",
+            "partnerUserRef": "sandbox-123"
+          })
         }
       );
-      if (order) {
+      if (createOrderResponse) {
+        const { order, paymentLink } = createOrderResponse;
         setOrderId(order.orderId);
-        const response = await apiClient.request<CreateOrderResponse>(
-          `/onramp/authorize-order/${order.orderId}`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              "type": "sms_otp"
-            })
-          }
-        );
-        if ()
+        setPaymentLink(paymentLink?.url ?? '');
+        // const authorizeResponse = await apiClient.request<CreateOrderResponse>(
+        //   `/onramp/authorize-order/${order.orderId}`,
+        //   {
+        //     method: "POST",
+        //     body: JSON.stringify({
+        //       "type": "sms_otp"
+        //     })
+        //   }
+        // );
         router.push("/two-factor");
       }
     }

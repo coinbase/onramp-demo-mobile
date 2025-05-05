@@ -1,14 +1,11 @@
-import { ONRAMP_OCB_GC_AP_URL } from "@/constants/constants";
-import { useApiClient } from "@/services/apiClient";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { WebView } from "react-native-webview";
 import ApplePayFundButtonLoading from "./ApplePayFundButtonLoading";
 import { APPLE_PAY_BUTTON_HEIGHT, APPLE_PAY_BUTTON_RADIUS } from "./constants";
 import {
   ApplePayGuestCheckoutMessage,
-  AuthType,
-  CreateOrderResponse,
 } from "./types";
+import { useApp } from "@/context/AppContext";
 
 /**
  * We are injecting a custom style to the webview to make the Apple Pay button look like our button.
@@ -33,32 +30,14 @@ true;
 `;
 
 export default function ApplePayFundButton() {
-  const apiClient = useApiClient();
-
   const webViewRef = useRef<WebView>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [applePayUrl, setApplePayUrl] = useState("1");
+  const { paymentLink } = useApp();
 
-  const authorizeOrder = async (
-    orderId: string,
-    authType: AuthType,
-    oneTimePassword: string
-  ) => {
-    try {
-      const response = await apiClient.request<CreateOrderResponse>(
-        `/onramp/authorize-order/${orderId}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            authType,
-            oneTimePassword,
-          }),
-        }
-      );
-    } catch (error) {
-      console.error("Error authorizing order:", error);
-    }
-  };
+  if (!paymentLink) {
+    return null;
+  }
 
   return (
     <>
@@ -88,7 +67,7 @@ export default function ApplePayFundButton() {
                 break;
             }
           }}
-          source={{ uri: ONRAMP_OCB_GC_AP_URL }}
+          source={{ uri: paymentLink }}
           startInLoadingState={true}
           javaScriptEnabled={true}
           domStorageEnabled={false}
