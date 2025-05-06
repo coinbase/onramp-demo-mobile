@@ -29,11 +29,16 @@ export const TwoFactorForm = ({
             onCodeSubmit(code);
         }
     }, [code, onCodeSubmit]);
+
+    const handleOnPhoneNumberClear = useCallback(() => {
+        setPhoneNumber("");
+        setUserPhoneNumber(null);
+    }, [setUserPhoneNumber]);
     
   return (
     <ThemedView style={{ height: "100%", flex: 1, flexDirection: "column", gap: 24, alignItems: "center", justifyContent: "space-between" }} >
       {step === "phone" ? (
-        <PhoneNumberInput value={phoneNumber} onChangeText={setPhoneNumber} />
+        <PhoneNumberInput value={phoneNumber} onChangeText={setPhoneNumber} onClear={handleOnPhoneNumberClear} />
       ) : (
         <CodeInput value={code} onChangeText={handleOnCodeSubmit} />
       )}

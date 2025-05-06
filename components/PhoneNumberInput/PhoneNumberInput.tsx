@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import React, { useCallback, useState, useEffect } from 'react';
+import { StyleSheet, TextInput, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { CountrySelector } from '../CountrySelector/CountrySelector';
+import { Ionicons } from '@expo/vector-icons';
 
 interface PhoneNumberInputProps {
   value: string;
@@ -11,6 +12,7 @@ interface PhoneNumberInputProps {
   error?: string;
   placeholder?: string;
   label?: string;
+  onClear?: () => void;
 }
 
 const DEFAULT_COUNTRY = {
@@ -26,6 +28,7 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   error,
   placeholder = 'Phone Number',
   label,
+  onClear
 }) => {
   const [formattedNumber, setFormattedNumber] = useState('');
   const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
@@ -59,6 +62,10 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
     setSelectedCountry(country);
   };
 
+  const handleClear = useCallback(() => {
+    onClear('');
+  }, [onClear]);
+
   return (
     <View style={styles.container}>
       {label && (
@@ -83,6 +90,11 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
           keyboardType="phone-pad"
           maxLength={14} // (123) 456-7890
         />
+        {formattedNumber.length > 0 && (
+          <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
+            <Ionicons name="close-circle" size={20} color={placeholderColor} />
+          </TouchableOpacity>
+        )}
       </ThemedView>
       {error && (
         <ThemedText style={[styles.error, { color: errorColor }]}>
@@ -118,5 +130,10 @@ const styles = StyleSheet.create({
   error: {
     fontSize: 12,
     marginTop: 4,
+  },
+  clearButton: {
+    paddingHorizontal: 12,
+    height: '100%',
+    justifyContent: 'center',
   },
 }); 
