@@ -4,7 +4,7 @@ import { CodeInput } from "@/components/CodeInput/CodeInput";
 import { ThemedView } from "@/components/ThemedView";
 import { Button } from "@/components/Button/Button";
 import { StyleSheet, View } from "react-native";
-
+import { useApp } from "@/context/AppContext";
 type TwoFactorFormProps = {
     onCodeSubmit: (code: string) => void;
 }
@@ -12,19 +12,20 @@ type TwoFactorFormProps = {
 export const TwoFactorForm = ({
     onCodeSubmit,
 }: TwoFactorFormProps) => {
+    const { userPhoneNumber } = useApp();
     const [step, setStep] = useState<"phone" | "code">("phone");
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState(userPhoneNumber ?? "");
     const [code, setCode] = useState("");
+    const { setUserPhoneNumber } = useApp();
 
     const handleOnPhoneNumberSubmit = useCallback(() => {
         setStep("code");
-    }, []);
+        setUserPhoneNumber(phoneNumber);
+    }, [phoneNumber, setUserPhoneNumber]);
 
     const handleOnCodeSubmit = useCallback((text: string) => {
         setCode(text);
-        console.log("code", code);
         if (code.length === 5) {
-            console.log("submitted code", code);
             onCodeSubmit(code);
         }
     }, [code, onCodeSubmit]);

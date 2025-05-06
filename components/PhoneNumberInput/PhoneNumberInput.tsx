@@ -34,12 +34,9 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   const placeholderColor = useThemeColor({}, 'foregroundMuted');
 
   useEffect(() => {
-    // Format the phone number as user types
     const formatPhoneNumber = (text: string) => {
-      // Remove all non-digit characters
       const cleaned = text.replace(/\D/g, '');
       
-      // Format based on length
       let formatted = '';
       if (cleaned.length > 0) {
         formatted = '(' + cleaned.substring(0, 3);
@@ -52,7 +49,6 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
       }
       
       setFormattedNumber(formatted);
-      // Pass the cleaned number back to parent
       onChangeText(cleaned);
     };
 
@@ -61,8 +57,6 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
 
   const handleCountrySelect = (country: any) => {
     setSelectedCountry(country);
-    // You might want to handle the country code change here
-    // For example, if you need to update the full phone number with the new country code
   };
 
   return (

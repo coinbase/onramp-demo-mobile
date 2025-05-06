@@ -49,6 +49,8 @@ type AppContextType = {
   setOrderId: (orderId: string | null) => void;
   paymentLink: string | null;
   setPaymentLink: (paymentLink: string | null) => void;
+  userPhoneNumber: string | null;
+  setUserPhoneNumber: (phoneNumber: string | null) => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -72,7 +74,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [appLoading, setAppLoading] = useState(false);
   const [appLoadingMessage, setAppLoadingMessage] = useState("Loading...");
   const [orderId, setOrderId] = useState<string | null>(null);
-
+  const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
   const [paymentCurrencies, setPaymentCurrencies] = useState<
     OnrampPaymentCurrency[]
   >([]);
@@ -162,6 +164,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     allNetworks,
     orderId,
     setOrderId,
+    userPhoneNumber,
+    setUserPhoneNumber,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
