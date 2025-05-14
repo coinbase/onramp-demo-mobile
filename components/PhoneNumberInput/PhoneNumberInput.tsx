@@ -56,7 +56,7 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   useEffect(() => {
     // Remove country code from value for display
     const numberWithoutCountryCode = value.replace(
-      selectedCountry.dialCode,
+      "(" + selectedCountry.dialCode + ")",
       ""
     );
     setDisplayValue(formatPhoneNumber(numberWithoutCountryCode));
@@ -65,16 +65,19 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   const handleInputChange = (text: string) => {
     const cleaned = text.replace(/\D/g, "");
     setDisplayValue(formatPhoneNumber(cleaned));
-    const fullNumber = selectedCountry.dialCode + cleaned;
+    const fullNumber = "(" + selectedCountry.dialCode + ")" + cleaned;
     onChangeText(fullNumber);
   };
 
   const handleCountrySelect = (country: any) => {
     setSelectedCountry(country);
     // Get the current number without country code
-    const currentNumber = value.replace(selectedCountry.dialCode, "");
+    const currentNumber = value.replace(
+      "(" + selectedCountry.dialCode + ")",
+      ""
+    );
     // Update with new country code
-    const fullNumber = country.dialCode + currentNumber;
+    const fullNumber = "(" + country.dialCode + ")" + currentNumber;
     onChangeText(fullNumber);
   };
 

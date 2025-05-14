@@ -38,7 +38,7 @@ export default function ApplePayFundButton() {
   useEffect(() => {
     // Make a request to create an order when the component is mounted.
     createOrder();
-  }, [fiatAmount]);
+  }, [fiatAmount, userPhoneNumber, userEmail]);
 
   const createOrder = async () => {
     if (!userPhoneNumber || !userEmail) {
@@ -49,6 +49,10 @@ export default function ApplePayFundButton() {
     try {
       const accessToken = await AsyncStorage.getItem("accessToken");
       const isSandboxMode = await AsyncStorage.getItem("isSandboxMode");
+
+      const partnerUserRef =
+        isSandboxMode === "true" ? "sandbox-123" : "some-partner-user-ref";
+
       const response = await apiClient.request<CreateOrderResponse>(
         "/onramp/create-order",
         {
@@ -61,11 +65,9 @@ export default function ApplePayFundButton() {
             paymentMethod: "GUEST_CHECKOUT_APPLE_PAY",
             destinationAddress: currentWallet?.address,
             destinationNetwork: selectedNetwork?.name,
-            //isQuote: true,
             email: userEmail,
             phoneNumber: userPhoneNumber,
-            partnerUserRef:
-              isSandboxMode === "true" ? "sandbox-123" : undefined,
+            partnerUserRef: partnerUserRef,
             agreementAcceptedAt: "2025-04-24T00:00:00Z",
           }),
         }

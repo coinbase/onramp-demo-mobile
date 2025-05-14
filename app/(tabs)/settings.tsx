@@ -16,14 +16,14 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function HomeScreen() {
+export default function SettingsScreen() {
   const [isSandboxMode, setIsSandboxMode] = useState(false);
 
   const insets = useSafeAreaInsets();
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
   const handleToggleSandboxMode = useCallback(() => {
     setIsSandboxMode(!isSandboxMode);
-    AsyncStorage.setItem("isSandboxMode", isSandboxMode.toString());
+    AsyncStorage.setItem("isSandboxMode", (!isSandboxMode).toString());
   }, [isSandboxMode]);
 
   useEffect(() => {
