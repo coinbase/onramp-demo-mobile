@@ -1,10 +1,10 @@
-import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet, TextInput, View, TouchableOpacity } from 'react-native';
-import { ThemedText } from '../ThemedText';
-import { ThemedView } from '../ThemedView';
-import { useThemeColor } from '@/hooks/useThemeColor';
-import { CountrySelector } from '../CountrySelector/CountrySelector';
-import { Ionicons } from '@expo/vector-icons';
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useState } from "react";
+import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { CountrySelector } from "../CountrySelector/CountrySelector";
+import { ThemedText } from "../ThemedText";
+import { ThemedView } from "../ThemedView";
 
 interface PhoneNumberInputProps {
   value: string;
@@ -16,61 +16,76 @@ interface PhoneNumberInputProps {
 }
 
 const DEFAULT_COUNTRY = {
-  code: 'US',
-  name: 'United States',
-  flag: '🇺🇸',
-  dialCode: '+1',
+  code: "US",
+  name: "United States",
+  flag: "🇺🇸",
+  dialCode: "+1",
 };
 
 export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   value,
   onChangeText,
   error,
-  placeholder = 'Phone Number',
+  placeholder = "Phone Number",
   label,
-  onClear
+  onClear,
 }) => {
-  const [formattedNumber, setFormattedNumber] = useState('');
+  const [displayValue, setDisplayValue] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
-  const lineColor = useThemeColor({}, 'line');
-  const errorColor = useThemeColor({}, 'negative');
-  const placeholderColor = useThemeColor({}, 'foregroundMuted');
+  const lineColor = useThemeColor({}, "line");
+  const errorColor = useThemeColor({}, "negative");
+  const placeholderColor = useThemeColor({}, "foregroundMuted");
+  const textColor = useThemeColor({}, "foreground");
 
+  const formatPhoneNumber = (text: string) => {
+    const cleaned = text.replace(/\D/g, "");
+    let formatted = "";
+    if (cleaned.length > 0) {
+      formatted = "(" + cleaned.substring(0, 3);
+    }
+    if (cleaned.length > 3) {
+      formatted += ") " + cleaned.substring(3, 6);
+    }
+    if (cleaned.length > 6) {
+      formatted += "-" + cleaned.substring(6, 10);
+    }
+    return formatted;
+  };
+
+  // Update display value when value changes
   useEffect(() => {
-    const formatPhoneNumber = (text: string) => {
-      const cleaned = text.replace(/\D/g, '');
-      
-      let formatted = '';
-      if (cleaned.length > 0) {
-        formatted = '(' + cleaned.substring(0, 3);
-      }
-      if (cleaned.length > 3) {
-        formatted += ') ' + cleaned.substring(3, 6);
-      }
-      if (cleaned.length > 6) {
-        formatted += '-' + cleaned.substring(6, 10);
-      }
-      
-      setFormattedNumber(formatted);
-      onChangeText(cleaned);
-    };
+    // Remove country code from value for display
+    const numberWithoutCountryCode = value.replace(
+      selectedCountry.dialCode,
+      ""
+    );
+    setDisplayValue(formatPhoneNumber(numberWithoutCountryCode));
+  }, [value, selectedCountry.dialCode]);
 
-    formatPhoneNumber(value);
-  }, [value, onChangeText]);
+  const handleInputChange = (text: string) => {
+    const cleaned = text.replace(/\D/g, "");
+    setDisplayValue(formatPhoneNumber(cleaned));
+    const fullNumber = selectedCountry.dialCode + cleaned;
+    onChangeText(fullNumber);
+  };
 
   const handleCountrySelect = (country: any) => {
     setSelectedCountry(country);
+    // Get the current number without country code
+    const currentNumber = value.replace(selectedCountry.dialCode, "");
+    // Update with new country code
+    const fullNumber = country.dialCode + currentNumber;
+    onChangeText(fullNumber);
   };
 
   const handleClear = useCallback(() => {
-    onClear('');
+    setDisplayValue("");
+    onClear?.();
   }, [onClear]);
 
   return (
     <View style={styles.container}>
-      {label && (
-        <ThemedText style={styles.label}>{label}</ThemedText>
-      )}
+      {label && <ThemedText style={styles.label}>{label}</ThemedText>}
       <ThemedView
         style={[
           styles.inputContainer,
@@ -82,15 +97,15 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
           onSelect={handleCountrySelect}
         />
         <TextInput
-          style={styles.input}
-          value={formattedNumber}
-          onChangeText={onChangeText}
+          style={[styles.input, { color: textColor }]}
+          value={displayValue}
+          onChangeText={handleInputChange}
           placeholder={placeholder}
           placeholderTextColor={placeholderColor}
           keyboardType="phone-pad"
           maxLength={14} // (123) 456-7890
         />
-        {formattedNumber.length > 0 && (
+        {displayValue.length > 0 && (
           <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
             <Ionicons name="close-circle" size={20} color={placeholderColor} />
           </TouchableOpacity>
@@ -107,24 +122,22 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    marginBottom: 16,
+    width: "100%",
   },
   label: {
     fontSize: 14,
     marginBottom: 8,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 8,
-    height: 48,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    height: '100%',
+    height: "100%",
     paddingHorizontal: 12,
   },
   error: {
@@ -133,7 +146,6 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     paddingHorizontal: 12,
-    height: '100%',
-    justifyContent: 'center',
+    justifyContent: "center",
   },
-}); 
+});

@@ -1,37 +1,44 @@
-import React, { useRef, useState } from 'react';
-import { StyleSheet, TextInput, View, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { ThemedText } from '../ThemedText';
-import { ThemedView } from '../ThemedView';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useThemeColor } from "@/hooks/useThemeColor";
+import React, { useRef, useState } from "react";
+import {
+  Keyboard,
+  StyleSheet,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { ThemedText } from "../ThemedText";
+import { ThemedView } from "../ThemedView";
 
 interface CodeInputProps {
-  value: string;
-  onChangeText: (text: string) => void;
+  onSubmit: (text: string) => void;
   error?: string;
   label?: string;
 }
 
 export const CodeInput: React.FC<CodeInputProps> = ({
-  value,
-  onChangeText,
+  onSubmit,
   error,
   label,
 }) => {
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const inputRefs = useRef<Array<TextInput | null>>([]);
-  const lineColor = useThemeColor({}, 'line');
-  const errorColor = useThemeColor({}, 'negative');
-  const primaryColor = useThemeColor({}, 'primary');
+  const lineColor = useThemeColor({}, "line");
+  const errorColor = useThemeColor({}, "negative");
+  const primaryColor = useThemeColor({}, "primary");
+  const textColor = useThemeColor({}, "foreground");
+  const [twoFACode, setTwoFACode] = useState<string>("");
 
   const handleChangeText = (text: string, index: number) => {
     // Only allow digits
-    const digit = text.replace(/\D/g, '');
-    
+    const digit = text.replace(/\D/g, "");
+
     // Create new value by replacing the digit at the current index
-    const newValue = value.padEnd(6, '');
-    const updatedValue = newValue.substring(0, index) + digit + newValue.substring(index + 1);
-    
-    onChangeText(updatedValue);
+    const newValue = twoFACode?.padEnd(6, "");
+    const updatedValue =
+      newValue?.substring(0, index) + digit + newValue?.substring(index + 1);
+
+    setTwoFACode(updatedValue);
 
     // Move to next input if a digit was entered and not the last one
     if (digit && index < 5) {
@@ -40,12 +47,13 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   };
 
   const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === 'Backspace') {
+    if (e.nativeEvent.key === "Backspace") {
       // Create new value by replacing the digit at the current index with '0'
-      const newValue = value.padEnd(6, '');
-      const updatedValue = newValue.substring(0, index) + '0' + newValue.substring(index + 1);
-      
-      onChangeText(updatedValue);
+      const newValue = twoFACode?.padEnd(6, "");
+      const updatedValue =
+        newValue?.substring(0, index) + "0" + newValue?.substring(index + 1);
+
+      setTwoFACode(updatedValue);
 
       // Move to previous input if not at the first one
       if (index > 0) {
@@ -65,9 +73,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        {label && (
-          <ThemedText style={styles.label}>{label}</ThemedText>
-        )}
+        {label && <ThemedText style={styles.label}>{label}</ThemedText>}
         <View style={styles.inputsContainer}>
           {Array.from({ length: 6 }).map((_, index) => (
             <ThemedView
@@ -85,8 +91,8 @@ export const CodeInput: React.FC<CodeInputProps> = ({
             >
               <TextInput
                 ref={(ref) => (inputRefs.current[index] = ref)}
-                style={styles.input}
-                value={value[index]}
+                style={[styles.input, { color: textColor }]}
+                value={twoFACode?.[index]}
                 onChangeText={(text) => handleChangeText(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 onFocus={() => handleFocus(index)}
@@ -95,6 +101,8 @@ export const CodeInput: React.FC<CodeInputProps> = ({
                 keyboardType="numeric"
                 maxLength={1}
                 selectTextOnFocus
+                returnKeyType="none"
+                blurOnSubmit={false}
               />
             </ThemedView>
           ))}
@@ -111,7 +119,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     marginBottom: 16,
   },
   label: {
@@ -119,8 +127,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   inputsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 8,
   },
   inputWrapper: {
@@ -128,17 +136,17 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderWidth: 1,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   input: {
     fontSize: 24,
-    textAlign: 'center',
-    width: '100%',
-    height: '100%',
+    textAlign: "center",
+    width: "100%",
+    height: "100%",
   },
   error: {
     fontSize: 12,
     marginTop: 4,
   },
-}); 
+});

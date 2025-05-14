@@ -14,6 +14,7 @@ import {
 } from "@/constants/types";
 import { useApp } from "@/context/AppContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useApiClient } from "@/services/apiClient";
 import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
 import { getCurrencyIcon } from "@/utils/getCurrencyIcon";
 import { getCurrencySymbol } from "@/utils/getCurrencySymbol";
@@ -21,13 +22,6 @@ import { getPaymentMethodIcon } from "@/utils/getPaymentMethodIcon";
 import { memo, useCallback } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { useAmountInput } from "./hooks/useAmountInput";
-import { router } from "expo-router";
-import { useApiClient } from "@/services/apiClient";
-
-import {
-
-  CreateOrderResponse,
-} from "@/components/ApplePayFundButton/types";
 
 type FundFormProps = {
   walletAddress: string;
@@ -116,36 +110,6 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
     },
     [currency, country, subdivision, cryptoAmount, asset]
   );
-
-  const handlePaymentSelection = useCallback(async (paymentMethod: OnrampPaymentMethod) => {
-    setPaymentMethod(paymentMethod);
-    if (paymentMethod.id === "APPLE_PAY_GUEST") {
-      const createOrderResponse = await apiClient.request<CreateOrderResponse>(
-        "/onramp/order",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            "paymentAmount": fiatAmount,
-            "paymentCurrency": "USD",
-            "purchaseCurrency": "USDC",
-            "paymentMethod": "GUEST_CHECKOUT_APPLE_PAY",
-            "destinationAddress": "0x55965974232d30f5200dcc39715dbbb7826b5591",
-            "destinationNetwork": "base",
-            "isQuote": true,
-            "email": "patrick.truong@coinbase.com",
-            "phoneNumber": "(+1)555-555-5555",
-            "partnerUserRef": "sandbox-123"
-          })
-        }
-      );
-      if (createOrderResponse) {
-        const { order, paymentLink } = createOrderResponse;
-        setOrderId(order.orderId);
-        setPaymentLink(paymentLink?.url ?? '');
-        router.push("/two-factor");
-      }
-    }
-  }, [fiatAmount, paymentMethod, setOrderId, setPaymentLink, router]);
 
   const isCurrencySelected = useCallback(
     (option: OnrampPaymentCurrency) => {
@@ -390,8 +354,9 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
 
           <Dropdown
             title="Pay with"
+            disabled={Number(fiatAmount) <= 0}
             value={paymentMethod}
-            onValueChange={handlePaymentSelection}
+            onValueChange={setPaymentMethod}
             isSelected={isPaymentMethodSelected}
             labelSelector={paymentMethodLabelSelector}
             keySelector={paymentMethodKeySelector}

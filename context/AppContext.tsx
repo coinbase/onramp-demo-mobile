@@ -10,6 +10,7 @@ import {
 } from "@/constants/types";
 import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
 import { fetchOnrampOptions } from "@coinbase/onchainkit/esm/fund/utils/fetchOnrampOptions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createContext,
   useCallback,
@@ -49,8 +50,10 @@ type AppContextType = {
   setOrderId: (orderId: string | null) => void;
   paymentLink: string | null;
   setPaymentLink: (paymentLink: string | null) => void;
-  userPhoneNumber: string | null;
-  setUserPhoneNumber: (phoneNumber: string | null) => void;
+  userPhoneNumber: string;
+  setUserPhoneNumber: (phoneNumber: string) => void;
+  userEmail: string;
+  setUserEmail: (email: string) => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -74,7 +77,39 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [appLoading, setAppLoading] = useState(false);
   const [appLoadingMessage, setAppLoadingMessage] = useState("Loading...");
   const [orderId, setOrderId] = useState<string | null>(null);
-  const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
+  const [userPhoneNumber, setUserPhoneNumberState] = useState<string>("");
+  const [userEmail, setUserEmailState] = useState<string>("");
+
+  useEffect(() => {
+    const getUserPhoneNumber = async () => {
+      const userPhoneNumber = await AsyncStorage.getItem("userPhoneNumber");
+      const userEmail = await AsyncStorage.getItem("userEmail");
+      if (userPhoneNumber) {
+        setUserPhoneNumber(userPhoneNumber);
+      }
+      if (userEmail) {
+        setUserEmailState(userEmail);
+      }
+    };
+    getUserPhoneNumber();
+  }, []);
+
+  const setUserPhoneNumber = useCallback(
+    (phoneNumber: string) => {
+      AsyncStorage.setItem("userPhoneNumber", phoneNumber);
+      setUserPhoneNumberState(phoneNumber);
+    },
+    [setUserPhoneNumberState]
+  );
+
+  const setUserEmail = useCallback(
+    (email: string) => {
+      AsyncStorage.setItem("userEmail", email);
+      setUserEmailState(email);
+    },
+    [setUserEmailState]
+  );
+
   const [paymentCurrencies, setPaymentCurrencies] = useState<
     OnrampPaymentCurrency[]
   >([]);
@@ -166,6 +201,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setOrderId,
     userPhoneNumber,
     setUserPhoneNumber,
+    userEmail,
+    setUserEmail,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,26 +1,40 @@
-import { useCallback, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useApp } from "@/context/AppContext";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Switch,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
-  const { network, userPhoneNumber, setUserPhoneNumber } = useApp();
-  const [ shouldResetPhoneNumber, setShouldResetPhoneNumber ] = useState(false);
+  const [isSandboxMode, setIsSandboxMode] = useState(false);
 
   const insets = useSafeAreaInsets();
+  const foregroundMuted = useThemeColor({}, "foregroundMuted");
+  const handleToggleSandboxMode = useCallback(() => {
+    setIsSandboxMode(!isSandboxMode);
+    AsyncStorage.setItem("isSandboxMode", isSandboxMode.toString());
+  }, [isSandboxMode]);
 
-  const handleTogglePhoneNumber = useCallback(() => {
-    setShouldResetPhoneNumber(!shouldResetPhoneNumber);
-  }, [shouldResetPhoneNumber]);
+  useEffect(() => {
+    const getIsSandboxMode = async () => {
+      const isSandboxMode = await AsyncStorage.getItem("isSandboxMode");
+      if (isSandboxMode) {
+        setIsSandboxMode(isSandboxMode === "true");
+      }
+    };
+    getIsSandboxMode();
+  }, []);
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -35,11 +49,24 @@ export default function HomeScreen() {
           style={styles.scroll}
           contentContainerStyle={[styles.scrollContent]}
         >
+          <TouchableOpacity
+            onPress={() => router.push("/user-info")}
+            style={styles.settingRow}
+          >
+            <ThemedText>User Info</ThemedText>
+            <Ionicons
+              name="chevron-forward-outline"
+              size={24}
+              color={foregroundMuted}
+            />
+          </TouchableOpacity>
+
           <View style={styles.settingRow}>
-            <ThemedText>Remove Phone Number</ThemedText>
+            <ThemedText>Apple Pay Guest Checkout Sandbox Mode</ThemedText>
+
             <Switch
-              value={!shouldResetPhoneNumber}
-              onValueChange={handleTogglePhoneNumber}
+              value={isSandboxMode}
+              onValueChange={handleToggleSandboxMode}
             />
           </View>
         </ScrollView>
@@ -57,9 +84,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 12,
   },
 });

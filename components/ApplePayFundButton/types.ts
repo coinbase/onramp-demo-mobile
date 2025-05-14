@@ -83,7 +83,8 @@ export type ApplePayGuestCheckoutEventName =
   | "onramp_api.load_success"
   | "onramp_api.load_pending"
   | "onramp_api.commit_error"
-  | "onramp_api.commit_success";
+  | "onramp_api.commit_success"
+  | "onramp_api.cancel";
 
 export type ApplePayGuestCheckoutMessage = {
   eventName: ApplePayGuestCheckoutEventName;

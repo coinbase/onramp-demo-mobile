@@ -1,16 +1,19 @@
-const BASE_URL = "https://pay.coinbase.com/api/v2";
-// REMOVE THIESE HARDCODED VALUES LATER
-const TEST_APP_ID = "1492f9ed-46d5-4f85-b547-c888a9981625"
-const TEST_API_KEY = "13d24c60-a94e-4eab-888e-e5b995d88aa7"
+import { usePrivy } from "@privy-io/expo";
+
+const BASE_URL = "http://onramp-demo-server.vercel.app";
 
 export function useApiClient() {
+  const { getAccessToken } = usePrivy();
 
   const getAuthHeaders = async (): Promise<Record<string, string>> => {
     try {
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error("No access token available");
+      }
 
       return {
-        "Cbpay-App-Id": TEST_APP_ID,
-        "Cbpay-Api-Key": TEST_API_KEY,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       };
     } catch (error) {
@@ -26,7 +29,6 @@ export function useApiClient() {
     try {
       const headers = await getAuthHeaders();
 
-      console.log("Headers", headers);
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         ...options,
         headers: {
@@ -39,7 +41,9 @@ export function useApiClient() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return response.json();
+      const responseJson = await response.json();
+
+      return responseJson.data;
     } catch (error) {
       console.error("API request failed:", error);
       throw error;

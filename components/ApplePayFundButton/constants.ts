@@ -1,2 +1,2 @@
-export const APPLE_PAY_BUTTON_HEIGHT = 56;
+export const APPLE_PAY_BUTTON_HEIGHT = 44;
 export const APPLE_PAY_BUTTON_RADIUS = 12;
