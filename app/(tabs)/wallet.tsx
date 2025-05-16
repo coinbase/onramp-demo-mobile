@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function WalletScreen() {
   const { logout } = useLogout();
   const insets = useSafeAreaInsets();
-  const { allNetworks, network } = useApp();
+  const { network } = useApp();
 
   const [selectedNetwork, setSelectedNetwork] = useState<OnrampNetwork>(
     network!

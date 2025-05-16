@@ -37,10 +37,13 @@ export default function ApplePayFundButton() {
 
   useEffect(() => {
     // Make a request to create an order when the component is mounted.
-    createOrder();
-  }, [fiatAmount, userPhoneNumber, userEmail]);
+    if (!paymentLink) {
+      createOrder();
+    }
+  }, [fiatAmount, userPhoneNumber, userEmail, paymentLink]);
 
   const createOrder = async () => {
+    setIsLoading(true);
     if (!userPhoneNumber || !userEmail) {
       router.push("/user-info");
       return;
@@ -84,6 +87,7 @@ export default function ApplePayFundButton() {
       }
     } catch (error) {
       console.error("Error creating order:", error);
+      setIsLoading(false);
     }
   };
 
@@ -108,6 +112,19 @@ export default function ApplePayFundButton() {
             switch (eventName) {
               case "onramp_api.load_success":
                 setIsLoading(false);
+                break;
+              case "onramp_api.commit_error":
+              case "onramp_api.cancel":
+                // Empty payment link so that the new transaction is created
+                setPaymentLink(null);
+                setIsLoading(false);
+                break;
+              case "onramp_api.commit_success":
+                // Wait for 2 seconds to allow apple pay to show the success icon
+                setTimeout(() => {
+                  setPaymentLink(null);
+                  setIsLoading(false);
+                }, 2000);
                 break;
               default:
                 break;
