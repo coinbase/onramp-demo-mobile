@@ -65,7 +65,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [asset, setAsset] = useState<OnrampPurchaseCurrency | undefined>(
     undefined
   );
-  const [fiatAmount, setFiatAmount] = useState("");
+  const [fiatAmount, setFiatAmount] = useState("5");
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [network, setNetwork] = useState<OnrampNetwork | undefined>(undefined);
   const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHOD_OPTIONS[0]);

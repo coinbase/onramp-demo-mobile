@@ -19,6 +19,9 @@ const ApplePayFundButtonLoading = ({ isLoading }: { isLoading: boolean }) => {
   useEffect(() => {
     if (!isLoading) {
       animateLoadingOut();
+    } else {
+      setIsRendered(true);
+      fadeAnim.setValue(1);
     }
   }, [isLoading]);
 
