@@ -14,6 +14,7 @@ import {
 } from "@/constants/types";
 import { useApp } from "@/context/AppContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useApiClient } from "@/services/apiClient";
 import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
 import { getCurrencyIcon } from "@/utils/getCurrencyIcon";
 import { getCurrencySymbol } from "@/utils/getCurrencySymbol";
@@ -48,11 +49,13 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
     purchaseCurrencies,
     dataLoading,
     setAppLoading,
-    allNetworks,
+    setOrderId,
+    setPaymentLink,
   } = useApp();
 
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
   const textColor = useThemeColor({}, "text");
+  const apiClient = useApiClient();
 
   const { handleFiatChange, handleCryptoChange } = useAmountInput({
     setFiatAmount,
@@ -351,6 +354,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
 
           <Dropdown
             title="Pay with"
+            disabled={Number(fiatAmount) <= 0}
             value={paymentMethod}
             onValueChange={setPaymentMethod}
             isSelected={isPaymentMethodSelected}
@@ -369,6 +373,7 @@ export const FundForm = memo(({ walletAddress }: FundFormProps) => {
         asset={asset?.symbol}
         walletAddress={walletAddress}
         walletChain={network?.name || "base"}
+        paymentMethod={paymentMethod}
       />
     </View>
   );

@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import WalletIcon from "@/assets/icons/WalletIcon";
+import GearIcon from "@/assets/icons/GearIcon";
 import { HapticTab } from "@/components/HapticTab";
 import { ThemedText } from "@/components/ThemedText";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -46,6 +47,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="wallet"
         options={{
@@ -65,6 +67,30 @@ export default function TabLayout() {
               }}
             >
               Wallet
+            </ThemedText>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, focused }) => (
+            <GearIcon
+              width={28}
+              height={28}
+              color={focused ? primaryColor : color}
+            />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <ThemedText
+              style={{
+                fontSize: 12,
+                color: focused ? primaryColor : color,
+              }}
+            >
+              Settings
             </ThemedText>
           ),
         }}

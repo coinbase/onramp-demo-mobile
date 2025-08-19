@@ -8,7 +8,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
@@ -60,16 +60,45 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <PrivyProvider
-          appId={PRIVY_APP_ID}
-          clientId={PRIVY_CLIENT_ID}
-          // supportedChains={[base, polygon, unichain]}
+        <PrivyProvider appId={PRIVY_APP_ID} clientId={PRIVY_CLIENT_ID} 
+            config={{
+              embedded: {
+                  ethereum: {
+                      createOnLogin: 'users-without-wallets',
+                  },
+                  solana: {
+                      createOnLogin: 'users-without-wallets',
+                  },
+              },
+          }}
         >
           <PrivyElements />
           <AppProvider>
             <BottomSheetModalProvider>
               <BottomSheetProvider>
-                <Slot />
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="user-info"
+                    options={{
+                      headerShown: true,
+                      headerBackButtonDisplayMode: "minimal",
+                      //presentation: "modal",
+                      // headerStyle: {
+                      //   backgroundColor:
+                      //     colorScheme === "dark" ? "#000" : "#fff",
+                      // },
+                      headerTitle: "User Info",
+                      //headerTintColor: colorScheme === "dark" ? "#fff" : "#000",
+                      // headerTitleStyle: {
+                      //   fontFamily: "Inter_600SemiBold",
+                      // },
+                    }}
+                  />
+                </Stack>
                 {loaded && <LoadingOverlay />}
               </BottomSheetProvider>
             </BottomSheetModalProvider>

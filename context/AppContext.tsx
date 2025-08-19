@@ -10,6 +10,7 @@ import {
 } from "@/constants/types";
 import { fetchExchangeRate } from "@/utils/fetchExchangeRate";
 import { fetchOnrampOptions } from "@coinbase/onchainkit/esm/fund/utils/fetchOnrampOptions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createContext,
   useCallback,
@@ -45,6 +46,14 @@ type AppContextType = {
   paymentCurrencies: OnrampPaymentCurrency[];
   purchaseCurrencies: OnrampPurchaseCurrency[];
   allNetworks: OnrampNetwork[];
+  orderId: string | null;
+  setOrderId: (orderId: string | null) => void;
+  paymentLink: string | null;
+  setPaymentLink: (paymentLink: string | null) => void;
+  userPhoneNumber: string;
+  setUserPhoneNumber: (phoneNumber: string) => void;
+  userEmail: string;
+  setUserEmail: (email: string) => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -56,7 +65,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [asset, setAsset] = useState<OnrampPurchaseCurrency | undefined>(
     undefined
   );
-  const [fiatAmount, setFiatAmount] = useState("");
+  const [fiatAmount, setFiatAmount] = useState("5");
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [network, setNetwork] = useState<OnrampNetwork | undefined>(undefined);
   const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHOD_OPTIONS[0]);
@@ -64,9 +73,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [country, setCountry] = useState("US");
   const [subdivision, setSubdivision] = useState("CA");
   const [dataLoading, setDataLoading] = useState(false);
-
+  const [paymentLink, setPaymentLink] = useState<string | null>(null);
   const [appLoading, setAppLoading] = useState(false);
   const [appLoadingMessage, setAppLoadingMessage] = useState("Loading...");
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [userPhoneNumber, setUserPhoneNumberState] = useState<string>("");
+  const [userEmail, setUserEmailState] = useState<string>("");
+
+  useEffect(() => {
+    const getUserPhoneNumber = async () => {
+      const userPhoneNumber = await AsyncStorage.getItem("userPhoneNumber");
+      const userEmail = await AsyncStorage.getItem("userEmail");
+      if (userPhoneNumber) {
+        setUserPhoneNumber(userPhoneNumber);
+      }
+      if (userEmail) {
+        setUserEmailState(userEmail);
+      }
+    };
+    getUserPhoneNumber();
+  }, []);
+
+  const setUserPhoneNumber = useCallback(
+    (phoneNumber: string) => {
+      AsyncStorage.setItem("userPhoneNumber", phoneNumber);
+      setUserPhoneNumberState(phoneNumber);
+    },
+    [setUserPhoneNumberState]
+  );
+
+  const setUserEmail = useCallback(
+    (email: string) => {
+      AsyncStorage.setItem("userEmail", email);
+      setUserEmailState(email);
+    },
+    [setUserEmailState]
+  );
 
   const [paymentCurrencies, setPaymentCurrencies] = useState<
     OnrampPaymentCurrency[]
@@ -135,6 +177,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     exchangeRate,
     dataLoading,
     country,
+    paymentLink,
     subdivision,
     setCurrency,
     setAsset,
@@ -144,6 +187,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setPaymentMethod,
     setExchangeRate,
     setCountry,
+    setPaymentLink,
     setSubdivision,
     setDataLoading,
     appLoading,
@@ -153,6 +197,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     paymentCurrencies,
     purchaseCurrencies,
     allNetworks,
+    orderId,
+    setOrderId,
+    userPhoneNumber,
+    setUserPhoneNumber,
+    userEmail,
+    setUserEmail,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

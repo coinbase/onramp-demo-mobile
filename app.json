@@ -31,7 +31,8 @@
       "scheme": "onrampdemo"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "applicationId": "com.coinbase.onramp.demo"
     },
     "extra": {
       "eas": {

@@ -1,21 +1,23 @@
 import { ThemedText } from "@/components/ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { MotiView } from "moti";
-import { StyleSheet, View } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
 type LoadingScreenProps = {
   message?: string;
+  containerStyle?: StyleProp<ViewStyle>;
 };
 
 export const LoadingScreen = ({
-  message = "Loading...",
+  message,
+  containerStyle,
 }: LoadingScreenProps) => {
   const backgroundColor = useThemeColor({}, "background");
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor }, containerStyle]}>
       <View style={styles.content}>
-        <View style={styles.loadingContainer}>
+        <View style={[styles.loadingContainer]}>
           {[...Array(3)].map((_, i) => (
             <MotiView
               key={i}
@@ -34,7 +36,9 @@ export const LoadingScreen = ({
             />
           ))}
         </View>
-        <ThemedText style={styles.loadingText}>{message}</ThemedText>
+        {message && (
+          <ThemedText style={styles.loadingText}>{message}</ThemedText>
+        )}
       </View>
     </View>
   );

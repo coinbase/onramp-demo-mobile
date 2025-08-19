@@ -1,0 +1,81 @@
+import { usePrivy } from "@privy-io/expo";
+
+const BASE_URL = "http://onramp-demo-server.vercel.app";
+
+export function useApiClient() {
+  const { getAccessToken } = usePrivy();
+
+  const getAuthHeaders = async (): Promise<Record<string, string>> => {
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error("No access token available");
+      }
+
+      return {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+    } catch (error) {
+      console.error("Error getting auth headers:", error);
+      throw error;
+    }
+  };
+
+  const request = async <T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> => {
+    try {
+      const headers = await getAuthHeaders();
+
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          ...headers,
+          ...options.headers,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseJson = await response.json();
+
+      return responseJson.data;
+    } catch (error) {
+      console.error("API request failed:", error);
+      throw error;
+    }
+  };
+
+  // Convenience methods for common HTTP methods
+  const get = <T>(endpoint: string, options?: RequestInit) =>
+    request<T>(endpoint, { ...options, method: "GET" });
+
+  const post = <T>(endpoint: string, data: any, options?: RequestInit) =>
+    request<T>(endpoint, {
+      ...options,
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+
+  const put = <T>(endpoint: string, data: any, options?: RequestInit) =>
+    request<T>(endpoint, {
+      ...options,
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+
+  const del = <T>(endpoint: string, options?: RequestInit) =>
+    request<T>(endpoint, { ...options, method: "DELETE" });
+
+  return {
+    request,
+    get,
+    post,
+    put,
+    delete: del,
+  };
+}

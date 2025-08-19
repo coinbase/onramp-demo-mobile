@@ -36,7 +36,7 @@ export type OnrampQuoteResponseData = {
    */
   coinbaseFee: OnrampAmount;
   /**
-   * Object with amount and currency of the network fee required to send the purchased crypto to the user’s wallet.
+   * Object with amount and currency of the network fee required to send the purchased crypto to the user's wallet.
    * The currency will match the `paymentCurrency`.
    */
   networkFee: OnrampAmount;
@@ -78,7 +78,7 @@ export type OnrampPurchaseCurrency = {
   id: string;
   name: string;
   symbol: string;
-  iconUrl: string;
+  iconUrl?: string;
   networks: OnrampNetwork[];
 };
 
@@ -93,7 +93,7 @@ export type OnrampNetwork = {
   displayName: string;
   chainId: string;
   contractAddress: string;
-  iconUrl: string;
+  iconUrl?: string;
 };
 
 export type OnrampPaymentMethodLimit = {
