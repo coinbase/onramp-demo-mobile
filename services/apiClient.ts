@@ -1,6 +1,7 @@
 import { usePrivy } from "@privy-io/expo";
 
-const BASE_URL = "http://onramp-demo-server.vercel.app";
+//const BASE_URL = "http://onramp-demo-server.vercel.app";
+const BASE_URL = "http://localhost:3000";
 
 export function useApiClient() {
   const { getAccessToken } = usePrivy();

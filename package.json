@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:ios": "npx expo run:ios",
     "build:dev": "expo run ios",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
@@ -65,7 +66,8 @@
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "viem": "^2.23.6"
+    "viem": "^2.23.6",
+    "expo-dev-client": "~5.0.20"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

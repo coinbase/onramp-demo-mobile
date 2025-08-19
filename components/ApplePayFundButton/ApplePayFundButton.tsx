@@ -80,6 +80,7 @@ export default function ApplePayFundButton() {
             phoneNumber: userPhoneNumber,
             partnerUserRef: partnerUserRef,
             agreementAcceptedAt: "2025-04-24T00:00:00Z",
+            phoneNumberVerifiedAt: new Date().toISOString(),
           }),
         }
       );
@@ -118,6 +119,7 @@ export default function ApplePayFundButton() {
               nativeEvent.data
             ) as ApplePayGuestCheckoutMessage;
 
+            console.log("nativeEvent", nativeEvent);
             console.log("Event executed: ", eventName);
             switch (eventName) {
               case "onramp_api.load_pending":

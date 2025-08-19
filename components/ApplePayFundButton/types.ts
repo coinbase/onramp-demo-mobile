@@ -6,6 +6,10 @@ export type CreateOrderResponse = {
   refreshToken?: RefreshToken;
 };
 
+export type TokenBalanceResponse = {
+  result: any;
+};
+
 export type AuthStep = {
   authType: AuthType;
   authStatus: AuthStatus;

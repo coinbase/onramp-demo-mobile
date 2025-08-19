@@ -2,8 +2,8 @@ import { OnrampNetwork } from "@/constants/types";
 import { useApp } from "@/context/AppContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useWalletBalance } from "@/hooks/useWalletBalance";
-import React, { memo, useCallback } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import React, { memo, useCallback, useState } from "react";
+import { Animated, Image, StyleSheet, View, Clipboard, Pressable } from "react-native";
 import { RowSpaceBetween } from "../blocks/RowSpaceBetween";
 import { Dropdown } from "../Dropdown/Dropdown";
 import { ThemedText } from "../ThemedText";
@@ -11,10 +11,13 @@ import { ThemedText } from "../ThemedText";
 type BalanceProps = {
   network?: OnrampNetwork;
   onNetworkChange: (network: OnrampNetwork) => void;
+  address?: string;
 };
 
-export const Balance = memo(({ network, onNetworkChange }: BalanceProps) => {
+export const Balance = memo(({ network, onNetworkChange, address }: BalanceProps) => {
   const foregroundMuted = useThemeColor({}, "foregroundMuted");
+  const [showCopied, setShowCopied] = useState(false);
+  const fadeAnim = useState(new Animated.Value(0))[0];
 
   const { allNetworks } = useApp();
 
@@ -63,6 +66,26 @@ export const Balance = memo(({ network, onNetworkChange }: BalanceProps) => {
     []
   );
 
+  const handleCopyAddress = async () => {
+    if (address) {
+      await Clipboard.setString(address);
+      setShowCopied(true);
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.delay(1500),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setShowCopied(false));
+    }
+  };
+
   return (
     <View style={styles.container}>
       <RowSpaceBetween>
@@ -91,6 +114,27 @@ export const Balance = memo(({ network, onNetworkChange }: BalanceProps) => {
           {balance || "0.00"}
         </ThemedText>
       </View>
+
+      <View style={styles.walletAddressContainer}>
+          <ThemedText
+            font="regular"
+            style={{ color: foregroundMuted, paddingBottom: 8 }}
+          >
+            {`${network?.displayName} wallet address`}
+          </ThemedText>
+          <Pressable onPress={handleCopyAddress}>
+            <ThemedText numberOfLines={3}>
+              {address || "Not connected"}
+            </ThemedText>
+            {showCopied && (
+              <Animated.View
+                style={[styles.copiedBadge, { opacity: fadeAnim }]}
+              >
+                <ThemedText style={styles.copiedText}>Copied!</ThemedText>
+              </Animated.View>
+            )}
+          </Pressable>
+        </View>
     </View>
   );
 });
@@ -98,6 +142,24 @@ export const Balance = memo(({ network, onNetworkChange }: BalanceProps) => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 16,
+  },
+  walletAddressContainer: {
+    flexDirection: "column",
+    height: 100,
+  },
+  copiedBadge: {
+    position: "absolute",
+    top: -24,
+    right: 0,
+    backgroundColor: "#00000099",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  copiedText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "500",
   },
   label: {
     fontSize: 16,

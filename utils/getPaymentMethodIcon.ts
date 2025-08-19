@@ -11,5 +11,7 @@ export const getPaymentMethodIcon = (paymentMethod: string) => {
       return ApplePayIcon;
     case "CARD":
       return CardIcon;
+    case "COINBASE_APP2APP":
+      return CoinbaseIcon;
   }
 };

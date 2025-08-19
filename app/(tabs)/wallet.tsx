@@ -1,3 +1,4 @@
+import { Balance } from "@/components/Balance/Balance";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { WalletDetails } from "@/components/WalletDetails/WalletDetails";
@@ -45,8 +46,8 @@ export default function WalletScreen() {
 
   const handleChangeNetwork = useCallback(
     async (network: OnrampNetwork) => {
-      setSelectedNetwork(network);
       await switchEVMChain(network.chainId);
+      setSelectedNetwork(network);
     },
     [switchEVMChain]
   );
@@ -68,16 +69,17 @@ export default function WalletScreen() {
       ]}
     >
       <View style={styles.content}>
-        {/* <Balance
+         <Balance
           network={selectedNetwork}
           onNetworkChange={handleChangeNetwork}
-        /> */}
+          address={currentWallet?.address}
+        />
 
-        <WalletDetails
+        {/* <WalletDetails
           address={currentWallet?.address}
           network={selectedNetwork}
           onNetworkChange={handleChangeNetwork}
-        />
+        /> */}
 
         <ThemedText>
           You can export your wallet by clicking the button below. It will take

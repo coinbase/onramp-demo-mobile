@@ -24,6 +24,11 @@ export const PAYMENT_METHOD_OPTIONS: OnrampPaymentMethod[] = [
     description: "ACH, debit, cash, crypto balance.",
   },
   {
+    id: "COINBASE_APP2APP",
+    displayName: "Coinbase App2App",
+    description: "ACH, debit, cash, crypto balance.",
+  },
+  {
     id: "APPLE_PAY",
     displayName: "Apple Pay",
     description: "Up to $500/week. No sign up required.",
